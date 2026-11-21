@@ -17,15 +17,19 @@ interface Way {
   wide?: boolean;
 }
 
-// Built by scripts/build-print.ts (bun run print; also in CI) into public/press/, each in a white
-// edition ("-light", for everyday printing) and a dark one.
+// Built by scripts/build-print.ts (bun run print; also in CI) into public/press/. Most come in a
+// white edition ("-light", for everyday printing) and a dark one; the cards are white only.
+const themed = (file: string) => [
+  { label: 'White', href: `${file}-light.pdf` },
+  { label: 'Dark', href: `${file}.pdf` },
+];
 const prints = [
   {
     title: 'Poster',
     text: 'For conference poster sessions and notice boards.',
     meta: 'A0 · PDF',
-    file: '/press/roar2027-poster-a0',
-    preview: '/press/preview-poster',
+    downloads: themed('/press/roar2027-poster-a0'),
+    preview: '/press/preview-poster-light.png',
     ratio: '841 / 1189',
     alt: 'Preview of the ROAR A0 poster: headline, key facts, the review process, key dates and a QR code.',
   },
@@ -33,17 +37,29 @@ const prints = [
     title: 'Flyer',
     text: 'Two-sided handout: the pitch on the front, how it works on the back.',
     meta: 'A5 · 2 pages · PDF',
-    file: '/press/roar2027-flyer-a5',
-    preview: '/press/preview-flyer',
+    downloads: themed('/press/roar2027-flyer-a5'),
+    preview: '/press/preview-flyer-light.png',
     ratio: '302 / 210',
     alt: 'Preview of the two-sided ROAR A5 flyer.',
+  },
+  {
+    title: 'Cards',
+    text: 'Four A6 cards on one A4 sheet: print, cut twice, hand out. Two-sided adds the review process on the back.',
+    meta: 'A4 → 4 × A6 · PDF',
+    downloads: [
+      { label: 'One-sided', href: '/press/roar2027-cards-a4.pdf' },
+      { label: 'Two-sided', href: '/press/roar2027-cards-a4-duplex.pdf' },
+    ],
+    preview: '/press/preview-cards.png',
+    ratio: '210 / 297',
+    alt: 'Preview of an A4 sheet with four identical ROAR cards and dashed cut lines between them.',
   },
   {
     title: 'Slide',
     text: 'One slide to end a talk with: the pitch, key dates and a QR code.',
     meta: '16:9 · PDF and PNG',
-    file: '/press/roar2027-slide',
-    preview: '/press/preview-slide',
+    downloads: themed('/press/roar2027-slide'),
+    preview: '/press/preview-slide-light.png',
     ratio: '16 / 9',
     alt: 'Preview of the ROAR 16:9 slide.',
   },
@@ -162,29 +178,25 @@ const ways: Way[] = [
     <div class="prints">
       {prints.map((item) => (
         <article class="print card">
-          <a
-            class="thumb"
-            href={href(`${item.file}-light.pdf`)}
-            style={`aspect-ratio:${item.ratio}`}
-          >
-            <img src={href(`${item.preview}-light.png`)} alt={item.alt} loading="lazy" />
+          <a class="thumb" href={href(item.downloads[0].href)} style={`aspect-ratio:${item.ratio}`}>
+            <img src={href(item.preview)} alt={item.alt} loading="lazy" />
           </a>
           <strong>{item.title}</strong>
           <span>{item.text}</span>
           <span class="meta">{item.meta}</span>
           <span class="editions">
-            <a class="button accent" href={href(`${item.file}-light.pdf`)}>
-              White
-            </a>
-            <a class="button secondary" href={href(`${item.file}.pdf`)}>
-              Dark
-            </a>
+            {item.downloads.map((d, i) => (
+              <a class:list={['button', i === 0 ? 'accent' : 'secondary']} href={href(d.href)}>
+                {d.label}
+              </a>
+            ))}
           </span>
         </article>
       ))}
     </div>
     <p class="extras">
-      White prints use far less ink; the dark editions suit screens and showpieces.
+      White prints use far less ink; the dark editions suit screens and showpieces. Print the cards
+      at actual size and cut along the dashed lines.
     </p>
     <ul class="extras-list">
       <li>
@@ -332,7 +344,7 @@ const ways: Way[] = [
   }
   .prints {
     display: grid;
-    grid-template-columns: 0.8fr 1.4fr 1.2fr;
+    grid-template-columns: 0.72fr 1.3fr 0.72fr 1.1fr;
     gap: 1rem;
     align-items: start;
   }
@@ -401,6 +413,11 @@ const ways: Way[] = [
   }
   .extras-list a {
     text-underline-offset: 0.2em;
+  }
+  @media (max-width: 1100px) {
+    .prints {
+      grid-template-columns: 0.55fr 1fr;
+    }
   }
   @media (max-width: 860px) {
     .ways,

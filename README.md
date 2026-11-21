@@ -58,7 +58,7 @@ and rebuttal late June – July · decisions early August · conference 28–29 
 | [Website](https://roar.laion.ai)                                 | Astro static site sharing laion.ai's design system                                                                                                                                           | `src/`                     |
 | [Poster hall](https://roar.laion.ai/poster-hall/)                | 3D preview in three.js: orbit or walk around (WASD), all generated in code                                                                                                                   | `src/scripts/poster-hall/` |
 | [Author kit](https://roar.laion.ai/call-for-papers/#author-kit)  | LaTeX class: one source, a human edition, an agent edition and a claims manifest; `roar_check.py` and the generation log format                                                              | `author-kit/`              |
-| [Print kit](https://roar.laion.ai/get-involved/#spread-the-word) | A0 poster, A5 flyer and slide, white and dark, with a QR code                                                                                                                                | `scripts/build-print.ts`   |
+| [Print kit](https://roar.laion.ai/get-involved/#spread-the-word) | A0 poster, A5 flyer, A4 sheet of four cards and slide, with a QR code                                                                                                                        | `scripts/build-print.ts`   |
 | Agent-readable files                                             | [`/llms.txt`](https://roar.laion.ai/llms.txt), [`/roar.json`](https://roar.laion.ai/roar.json), [`/AGENTS.md`](https://roar.laion.ai/AGENTS.md), [`/LOGS.md`](https://roar.laion.ai/LOGS.md) | `src/pages/*.ts`           |
 | Logo                                                             | Paw seal with the "Citation" wordmark, as outlined SVGs                                                                                                                                      | `public/brand/`            |
 
@@ -153,8 +153,9 @@ files, so the check fails when they change and the log does not. After editing `
 ### Print kit and agent-readable files
 
 `bun run print` (`scripts/build-print.ts`) builds the A0 poster, the two-sided A5 flyer and the
-16:9 slide, each in a white edition (`-light`, for everyday printing) and a dark one, plus a QR
-code with the LAION paw and previews, into `public/press/`. The layouts are HTML in the site's
+16:9 slide, each in a white edition (`-light`, for everyday printing) and a dark one; an A4
+sheet of four A6 cards to cut out and hand out (white, one- or two-sided); and a QR code with
+the LAION paw and previews, into `public/press/`. The layouts are HTML in the site's
 fonts and colours, printed to vector PDF by headless Chrome (set `CHROME_PATH` if it isn't found).
 Facts come from `src/data/conference.ts`. The deploy runs it too; the files are not committed.
 

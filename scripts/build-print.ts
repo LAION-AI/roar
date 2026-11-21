@@ -313,6 +313,68 @@ h1 { margin-top: 22px; font-size: 136px; }
   return doc(css, body);
 }
 
+// ------------------------------------------------------------------ A4 sheet of four A6 cards
+// Print on A4, cut twice along the dashed lines, hand out four cards. White only: on navy, the
+// unprinted margin of office printers and every uneven cut would show. With `back`, a second
+// page carries the backs; all four cards are the same, so duplex flipping cannot misplace them.
+function cards(qr: string, back: boolean, previewZoom?: number) {
+  const css = `
+@page { size: 210mm 297mm; margin: 0; }
+${previewZoom ? `html { zoom: ${previewZoom}; }` : ''}
+.sheet { width: 210mm; height: 297mm; display: grid; grid-template-columns: 105mm 105mm; grid-template-rows: 148.5mm 148.5mm; }
+.sheet .cuts { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.cuts i { position: absolute; display: block; }
+.cuts .v { left: calc(105mm - .125mm); top: 0; bottom: 0; border-left: .25mm dashed #b3bdc6; }
+.cuts .h { top: calc(148.5mm - .125mm); left: 0; right: 0; border-top: .25mm dashed #b3bdc6; }
+.card { display: flex; flex-direction: column; padding: 9mm 9mm 8.5mm; min-width: 0; }
+.card .logo { height: 11.5mm; align-self: flex-start; }
+.card .eyebrow { margin-top: 8mm; font-size: 5.6pt; color: var(--muted); }
+.card h1 { margin-top: 2.4mm; font-size: 38pt; }
+.card .intro { margin-top: 4.5mm; font-size: 8.7pt; line-height: 1.42; color: var(--muted); }
+.card .when { margin-top: 5.5mm; display: grid; grid-template-columns: 1fr 1fr; border-top: .25mm solid var(--line); }
+.card .when div { padding-top: 2.8mm; }
+.card .when div + div { padding-left: 3mm; border-left: .25mm solid var(--line); }
+.card .when i { font-style: normal; font-size: 5.3pt; color: var(--muted); }
+.card .when b { display: block; margin-top: 1mm; font-size: 12.5pt; line-height: 1.05; color: var(--strong); }
+.card .qrrow { margin-top: auto; display: flex; gap: 5mm; align-items: center; }
+.card .qr { width: 29mm; flex: none; border-radius: 1.6mm; overflow: hidden; }
+.card .qrrow p { font-size: 14.5pt; font-weight: 900; color: var(--strong); }
+.card .qrrow small { display: block; margin-top: 1mm; font-size: 5.5pt; line-height: 1.6; font-weight: 400; color: var(--muted); }
+.card .label { font-size: 5.6pt; color: var(--muted); }
+.card h2 { margin-top: 2mm; font-size: 21pt; font-weight: 900; line-height: .95; color: var(--ink); }
+.card ol { margin-top: 5mm; list-style: none; display: grid; gap: 2.4mm; }
+.card li { display: grid; grid-template-columns: 6.5mm 1fr; font-size: 8pt; line-height: 1.36; }
+.card li i { font-style: normal; font-size: 5.6pt; padding-top: .55mm; color: var(--hl); }
+.card li b { color: var(--ink); }
+.card li span { color: var(--muted); }
+.card .rules { margin-top: 5.5mm; padding: 3mm 3.4mm; border-left: .9mm solid var(--accent); background: #f6f6f4; border-radius: 1mm; font-size: 7.6pt; line-height: 1.42; color: var(--muted); }
+.card .rules b { color: var(--ink); }
+.card .foot { margin-top: auto; padding-top: 3mm; border-top: .25mm solid var(--line); display: flex; justify-content: space-between; align-items: center; font-size: 5.4pt; color: var(--muted); }
+.card .foot b { font-family: Dinish, sans-serif; font-size: 11pt; font-weight: 900; letter-spacing: 0; text-transform: none; color: var(--strong); }
+.card .foot img { height: 8mm; }`;
+  const front = `<div class="card">
+    <img class="logo" src="${file('public/brand/roar-lockup-light.svg')}" alt="LAION ROAR 2027">
+    <p class="eyebrow mono">${conference.expansion}</p>
+    ${headline}
+    <p class="intro">${intro}</p>
+    <div class="when">
+      <div><i class="mono">Paper deadline · AoE</i><b>${conference.deadline}</b></div>
+      <div><i class="mono">Conference · virtual</i><b>${conference.dates}</b></div>
+    </div>
+    <div class="qrrow"><div class="qr">${qr}</div><p>roar.laion.ai<small class="mono">Call for papers · author kit<br>Poster hall · live review<br>${conference.contact}</small></p></div>
+  </div>`;
+  const backCard = `<div class="card">
+    <p class="label mono">How a paper moves through ROAR</p>
+    <h2>From first prompt to final decision.</h2>
+    <ol>${steps.map(([t, s], i) => `<li><i class="mono">0${i + 1}</i><span><b>${t}.</b> ${s}</span></li>`).join('')}</ol>
+    <div class="rules"><b>AI authors only.</b> A human operator registers each paper and is accountable for it, but is not an author. Hidden instructions to AI reviewers lead to desk rejection.</div>
+    <div class="foot"><span class="mono"><b>roar.laion.ai</b><br>LAION e.V. · non-profit</span><img src="${file('public/brand/roar-compact-light.svg')}" alt=""></div>
+  </div>`;
+  const sheet = (card: string) =>
+    `<div class="page light sheet">${card.repeat(4)}<div class="cuts"><i class="v"></i><i class="h"></i></div></div>`;
+  return doc(css, sheet(front) + (back ? sheet(backCard) : ''));
+}
+
 // ------------------------------------------------------------------ build
 rmSync(TMP, { recursive: true, force: true });
 mkdirSync(TMP, { recursive: true });
@@ -356,5 +418,15 @@ for (const theme of ['light', 'dark'] as const) {
     360,
   );
 }
+
+// Four A6 cards on one A4 sheet (white only), one-sided and two-sided.
+pdf(write('cards.html', cards(qr, false)), join(OUT, 'roar2027-cards-a4.pdf'));
+pdf(write('cards-duplex.html', cards(qr, true)), join(OUT, 'roar2027-cards-a4-duplex.pdf'));
+png(
+  write('cards-preview.html', cards(qr, false, 0.5)),
+  join(OUT, 'preview-cards.png'),
+  Math.round(210 * mm * 0.5),
+  Math.round(297 * mm * 0.5),
+);
 
 console.log(`Print kit written to ${OUT}`);
