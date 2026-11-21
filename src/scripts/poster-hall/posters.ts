@@ -78,18 +78,31 @@ const B = [
   'Benchmarks',
 ] as const;
 const D = [
-  'for Theorem Proving',
+  'in the Wild',
   'at Scale',
   'under Distribution Shift',
   'without Human Labels',
   'with Verifiable Rewards',
   'for Scientific Discovery',
-  'in Low-Resource Languages',
+  'on a Compute Budget',
   'from Synthetic Data',
   'for Long-Horizon Tasks',
   'that Explain Themselves',
 ] as const;
-const TOPICS = [
+// Subjects that fit each topic area of the hall, so titles match the floor labels.
+const SUBJECTS: Record<string, readonly string[]> = {
+  Biology: [
+    'Protein Design',
+    'Gene Regulatory Models',
+    'Single-Cell Atlases',
+    'Enzyme Engineering',
+  ],
+  Reasoning: ['Proof Search', 'Theorem Provers', 'Math Solvers', 'Program Synthesis'],
+  Agents: ['Tool-Using Agents', 'Multi-Agent Debate', 'Agent Benchmarks', 'Reviewer Agents'],
+  Robotics: ['Grasp Planners', 'World Models', 'Navigation Policies', 'Sim-to-Real Transfer'],
+  Language: ['Translation Models', 'Long-Context Retrieval', 'Reward Models', 'Tokenizers'],
+};
+export const TOPICS = [
   'Reasoning',
   'Agents',
   'Biology',
@@ -110,14 +123,16 @@ export interface PosterInfo {
   gain: string;
 }
 
-export function posterInfo(seed: number, outstanding = false): PosterInfo {
+/** `topic` places the poster in a topic area of the hall; without it one is picked at random. */
+export function posterInfo(seed: number, outstanding = false, topic?: string): PosterInfo {
   const r = rng(seed * 7919 + 17);
   // Accepted posters score 6–8 on average; outstanding ones higher.
   const base = outstanding ? 8 : 6 + Math.floor(r() * 3);
+  const chosen = topic ?? pick(r, TOPICS);
   return {
     id: `#${String(100 + ((seed * 37) % 900)).padStart(4, '0')}`,
-    title: `${pick(r, A)} ${pick(r, B)} ${pick(r, D)}`,
-    topic: pick(r, TOPICS),
+    title: `${pick(r, A)} ${pick(r, SUBJECTS[chosen] ?? B)} ${pick(r, D)}`,
+    topic: chosen,
     scores: Array.from({ length: 6 }, () =>
       Math.min(10, Math.max(3, base + Math.round(r() * 3 - 1))),
     ),
@@ -472,6 +487,22 @@ export function drawBackdrop(width = 2048, height = 640): HTMLCanvasElement {
 }
 
 /** Soft round shadow / glow used under every avatar. */
+/** Topic label painted on the floor of a topic area (drawn white; opacity is set on the material). */
+export function drawFloorLabel(topic: string, count: number): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 320;
+  const ctx = canvas.getContext('2d')!;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '400 34px ui-monospace, Menlo, monospace';
+  ctx.fillText(`TOPIC · ${count} POSTERS`, 512, 62);
+  ctx.font = '900 176px Dinish, sans-serif';
+  ctx.fillText(topic.toUpperCase(), 512, 236);
+  ctx.fillRect(412, 276, 200, 8);
+  return canvas;
+}
+
 export function drawBlob(color = '0,0,0', alpha = 0.5): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 64;

@@ -258,10 +258,24 @@ export function buildCrowd(scene: THREE.Scene, posters: PosterSpot[], visitors =
     }
   }
 
+  /** Visitors step aside for the player in walk mode (also while the crowd is paused). */
+  function avoid(player: THREE.Vector3, radius = 1.2) {
+    for (const w of walkers) {
+      if (w.kind === 'presenter') continue;
+      const dx = w.group.position.x - player.x;
+      const dz = w.group.position.z - player.z;
+      const d = Math.hypot(dx, dz);
+      if (d > 0.001 && d < radius) {
+        w.group.position.x = player.x + (dx / d) * radius;
+        w.group.position.z = player.z + (dz / d) * radius;
+      }
+    }
+  }
+
   const counts = {
     presenters: walkers.filter((w) => w.kind === 'presenter').length,
     agents: walkers.filter((w) => w.kind === 'agent').length,
     humans: walkers.filter((w) => w.kind === 'human').length,
   };
-  return { update, counts };
+  return { update, avoid, counts };
 }

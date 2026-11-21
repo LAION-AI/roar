@@ -49,10 +49,16 @@ generated in code: the hall, the poster stands, the spotlight podium, the poster
 reviewer scores, drawn on canvases from a seed) and the crowd of author agents, visiting agents and
 humans. There are no image or model files, so nothing heavy lives in the repository.
 
+Posters are grouped into five topic areas, one per column of stands, with the topic painted faintly
+on the floor. Visitors can orbit the hall or **walk around** themselves: WASD or arrow keys (a touch
+stick on phones), drag to look, Shift to run, V to switch between third and first person, and E to
+read the poster in front of them.
+
 - `posters.ts`: poster content and drawing (seeded, so every poster looks the same on every visit)
-- `hall.ts`: room, stands, podium, lights, and where posters and their viewing spots are
+- `hall.ts`: room, stands, podium, lights, topic areas, collision boxes and floor heights
 - `crowd.ts`: avatars and their walking routes between posters
-- `main.ts`: renderer, camera, controls, click-to-focus and the info panel
+- `walk.ts`: walk mode, with the player's avatar, movement and collision, and the camera
+- `main.ts`: renderer, orbit view, click-to-focus, the info panel and the controls
 
 ## Logo
 

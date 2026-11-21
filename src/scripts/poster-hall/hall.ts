@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { drawBackdrop, drawPoster, posterInfo, type PosterInfo } from './posters';
+import { drawBackdrop, drawFloorLabel, drawPoster, posterInfo, type PosterInfo } from './posters';
 
 export interface PosterSpot {
   mesh: THREE.Mesh;
@@ -17,6 +17,8 @@ export interface PosterSpot {
 
 export const LAYOUT = {
   boardXs: [-12, -6, 0, 6, 12],
+  /** One topic area per column of stands (same order as boardXs). */
+  topics: ['Biology', 'Reasoning', 'Agents', 'Robotics', 'Language'],
   rowZs: [5, -5],
   /** Free columns between and beside the boards, used for walking routes. */
   gapXs: [-15, -9, -3, 3, 9, 15],
@@ -27,6 +29,26 @@ export const LAYOUT = {
 
 const POSTER_W = 1.5;
 const POSTER_H = POSTER_W * 1.414;
+
+/** Solid obstacles for walking, as boxes on the floor plan (x/z). */
+export interface Solid {
+  minX: number;
+  maxX: number;
+  minZ: number;
+  maxZ: number;
+}
+
+/** Floor height at a point: 0 on the hall floor, up the podium stairs to 0.9 on the platform. */
+export function floorHeight(x: number, z: number) {
+  const pz = LAYOUT.podiumZ;
+  if (Math.abs(x) <= 12 && z >= pz - 3.5 && z <= pz + 3.5) return 0.9;
+  for (let i = 2; i >= 0; i--) {
+    const halfWidth = (10 - i * 0.6) / 2;
+    const zc = pz + 3.5 + 0.6 * (2 - i) + 0.3;
+    if (Math.abs(x) <= halfWidth && Math.abs(z - zc) <= 0.3) return 0.3 * (i + 1);
+  }
+  return 0;
+}
 
 /** Posters glow a little, like lit boards, so they stay readable in the dim hall. */
 export const POSTER_GLOW = 0.38;
@@ -50,6 +72,7 @@ function texture(canvas: HTMLCanvasElement, renderer: THREE.WebGLRenderer) {
 export function buildHall(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
   const posters: PosterSpot[] = [];
   const frames: THREE.Mesh[] = [];
+  const solids: Solid[] = [];
 
   scene.background = new THREE.Color(0x061220);
   scene.fog = new THREE.Fog(0x061220, 34, 80);
@@ -108,18 +131,19 @@ export function buildHall(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
   const poleY = 1.05 + POSTER_H / 2;
   let seed = 1;
   for (const z of LAYOUT.rowZs) {
-    for (const x of LAYOUT.boardXs) {
+    for (const [col, x] of LAYOUT.boardXs.entries()) {
       const board = new THREE.Mesh(boardGeo, boardMat);
       board.position.set(x, poleY, z);
       scene.add(board);
       frames.push(board);
+      solids.push({ minX: x - 0.98, maxX: x + 0.98, minZ: z - 0.08, maxZ: z + 0.08 });
       for (const lx of [-0.65, 0.65]) {
         const leg = new THREE.Mesh(legGeo, legMat);
         leg.position.set(x + lx, 0.525, z);
         scene.add(leg);
       }
       for (const side of [1, -1]) {
-        const info = posterInfo(seed);
+        const info = posterInfo(seed, false, LAYOUT.topics[col]);
         const mesh = new THREE.Mesh(
           posterGeo,
           posterMaterial(texture(drawPoster(info, seed), renderer)),
@@ -143,6 +167,27 @@ export function buildHall(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
       }
     }
   }
+
+  // Topic areas: the topic of each column of stands, painted faintly on the floor in the
+  // centre aisle and at the entrance side.
+  const perTopic = LAYOUT.rowZs.length * 2;
+  const labelGeo = new THREE.PlaneGeometry(4.6, 4.6 / 3.2);
+  LAYOUT.topics.forEach((topic, col) => {
+    const map = texture(drawFloorLabel(topic, perTopic), renderer);
+    const mat = new THREE.MeshBasicMaterial({
+      map,
+      color: 0xf5c84c,
+      transparent: true,
+      opacity: 0.22,
+      depthWrite: false,
+    });
+    for (const z of [0, 10.2]) {
+      const label = new THREE.Mesh(labelGeo, mat);
+      label.rotation.x = -Math.PI / 2;
+      label.position.set(LAYOUT.boardXs[col], 0.02, z);
+      scene.add(label);
+    }
+  });
 
   // Podium with the outstanding papers
   const podium = new THREE.Group();
@@ -185,6 +230,7 @@ export function buildHall(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
     frame.position.set(x, y, z);
     scene.add(frame);
     frames.push(frame);
+    solids.push({ minX: x - 1.95, maxX: x + 1.95, minZ: z - 0.1, maxZ: z + 0.1 });
     const info = posterInfo(900 + i, true);
     const mesh = new THREE.Mesh(
       bigGeo,
@@ -219,5 +265,5 @@ export function buildHall(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
   backdrop.position.set(0, backdropW / 3.2 / 2, LAYOUT.podiumZ - 3.6);
   scene.add(backdrop);
 
-  return { posters, frames };
+  return { posters, frames, solids };
 }

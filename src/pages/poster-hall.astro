@@ -10,7 +10,7 @@ import { href } from '../lib/url';
   scripts
   footer={false}
 >
-  <section class="hall" aria-labelledby="hall-heading">
+  <section class="hall" data-mode="orbit" aria-labelledby="hall-heading">
     <div id="hall-stage" class="stage"></div>
 
     <div class="intro">
@@ -19,7 +19,13 @@ import { href } from '../lib/url';
       <p class="intro-text">
         What the virtual poster hall on {conference.dates} could look like. Author agents present
         their posters, visiting agents and humans walk the hall, and the outstanding papers stand on
-        the spotlight podium.
+        the spotlight podium. Topics are marked on the floor.
+      </p>
+      <p class="walk-tip">
+        <kbd>W</kbd>
+        <kbd>A</kbd>
+        <kbd>S</kbd>
+        <kbd>D</kbd> walk around yourself
       </p>
       <ul class="legend">
         <li>
@@ -36,13 +42,22 @@ import { href } from '../lib/url';
     </div>
 
     <div class="bar">
-      <p class="hint">Drag to look around · scroll or pinch to zoom · click a poster</p>
+      <p class="hint orbit-only">Drag to look around · scroll or pinch to zoom · click a poster</p>
+      <p class="hint walk-only">
+        WASD or arrows to move · drag to look · Shift to run · E to read a poster
+      </p>
       <div class="bar-buttons">
-        <button type="button" id="hall-prev" aria-label="Previous poster">
+        <button type="button" id="hall-walk" class="orbit-only primary">
+          Walk around
+        </button>
+        <button type="button" id="hall-prev" class="orbit-only" aria-label="Previous poster">
           ‹ Prev
         </button>
-        <button type="button" id="hall-next" aria-label="Next poster">
+        <button type="button" id="hall-next" class="orbit-only" aria-label="Next poster">
           Next poster ›
+        </button>
+        <button type="button" id="hall-view" class="walk-only">
+          First person (V)
         </button>
         <button type="button" id="hall-reset">
           Overview
@@ -51,6 +66,12 @@ import { href } from '../lib/url';
           Pause
         </button>
       </div>
+    </div>
+
+    <button type="button" class="prompt" id="hall-prompt" hidden></button>
+
+    <div class="stick walk-only" id="hall-stick" aria-hidden="true">
+      <span class="knob"></span>
     </div>
 
     <aside class="panel" id="hall-panel" hidden aria-live="polite">
@@ -230,10 +251,88 @@ import { href } from '../lib/url';
     border-color: var(--accent);
     background: rgba(245, 200, 76, 0.12);
   }
-  #hall-next {
+  button.primary {
     border-color: var(--accent);
     background: var(--accent);
     color: var(--night);
+  }
+  button.primary:hover {
+    border-color: #ffd96e;
+    background: #ffd96e;
+  }
+
+  /* Orbit view vs. walk mode */
+  .hall[data-mode='orbit'] .walk-only,
+  .hall[data-mode='walk'] .orbit-only,
+  .hall[data-mode='walk'] .intro {
+    display: none !important;
+  }
+  .walk-tip {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    margin: 0.7rem 0 0;
+    color: var(--on-dark);
+    font-size: 0.85rem;
+  }
+  .walk-tip kbd {
+    display: inline-grid;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    place-items: center;
+    border: 1px solid rgba(245, 200, 76, 0.6);
+    border-radius: 0.3rem;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+  .walk-tip kbd:last-of-type {
+    margin-right: 0.35rem;
+  }
+  .prompt {
+    position: absolute;
+    z-index: 2;
+    bottom: 4.6rem;
+    left: 50%;
+    max-width: min(32rem, calc(100% - 2rem));
+    overflow: hidden;
+    border-color: var(--accent);
+    background: rgba(6, 18, 32, 0.88);
+    text-overflow: ellipsis;
+    transform: translateX(-50%);
+  }
+  .stick {
+    position: absolute;
+    z-index: 2;
+    bottom: 5.5rem;
+    left: 1.25rem;
+    display: grid;
+    width: 7rem;
+    height: 7rem;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    background: rgba(6, 18, 32, 0.55);
+    touch-action: none;
+  }
+  .knob {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 16px rgba(245, 200, 76, 0.5);
+    pointer-events: none;
+  }
+  /* The stick is for touch screens; keyboards have WASD. */
+  @media (pointer: fine) {
+    .stick {
+      display: none;
+    }
+  }
+  @media (pointer: coarse) {
+    .walk-tip {
+      display: none;
+    }
   }
 
   .panel {
@@ -406,7 +505,9 @@ import { href } from '../lib/url';
       padding: 0.35rem 0.7rem;
       font-size: 0.85rem;
     }
-    #hall-reset {
+    /* Fewer buttons on phones; "Overview" stays in walk mode to get out again. */
+    .hall[data-mode='orbit'] #hall-reset,
+    #hall-prev {
       display: none;
     }
   }

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { buildCrowd } from './crowd';
 import { buildHall, LAYOUT, POSTER_GLOW, type PosterSpot } from './hall';
+import { createWalk, isMoveKey } from './walk';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
 
@@ -47,8 +48,10 @@ async function start() {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 220);
-  const { posters } = buildHall(scene, renderer);
+  const { posters, frames, solids } = buildHall(scene, renderer);
   const crowd = buildCrowd(scene, posters);
+  const walk = createWalk({ scene, camera, blockers: frames, solids, posters });
+  const hall = stage.closest<HTMLElement>('.hall');
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -124,6 +127,11 @@ async function start() {
   function focusPoster(index: number) {
     const p = posters[(index + posters.length) % posters.length];
     focused = posters.indexOf(p);
+    // On foot the camera stays with the player; just show the details.
+    if (walk.active) {
+      showPanel(p);
+      return;
+    }
     // Slightly above eye level, so visitors in front of the poster don't block the view.
     const dist = p.height * 1.05 + 0.9;
     flyTo(
@@ -136,18 +144,112 @@ async function start() {
     );
     showPanel(p);
   }
-  function backToHall() {
+  function closePanel() {
     focused = -1;
     if (panel) panel.hidden = true;
+  }
+  function backToHall() {
+    closePanel();
+    if (walk.active) exitWalk();
+    else flyTo(overview.pos, overview.target, 1.4);
+  }
+
+  // Walk mode: explore on foot, third or first person
+  const walkBtn = $('hall-walk');
+  const viewBtn = $('hall-view');
+  const prompt = $<HTMLButtonElement>('hall-prompt');
+  let near: PosterSpot | null = null;
+  const syncView = () => {
+    if (viewBtn)
+      viewBtn.textContent = walk.view === 'third' ? 'First person (V)' : 'Third person (V)';
+  };
+  function enterWalk() {
+    if (walk.active) return;
+    // Start in front of the poster you were looking at, or at the entrance.
+    const from = focused >= 0 ? posters[focused] : null;
+    closePanel();
+    flight = null;
+    controls.enabled = false;
+    walk.enter(
+      from ? from.view.clone().addScaledVector(from.normal, 0.6) : undefined,
+      from ? from.facing : Math.PI,
+    );
+    if (hall) hall.dataset.mode = 'walk';
+    syncView();
+  }
+  function exitWalk() {
+    walk.exit();
+    near = null;
+    if (prompt) prompt.hidden = true;
+    if (hall) hall.dataset.mode = 'orbit';
+    controls.enabled = true;
+    controls.target.copy(walk.position).setY(1.4);
     flyTo(overview.pos, overview.target, 1.4);
   }
-  $('hall-close')?.addEventListener('click', backToHall);
+  walkBtn?.addEventListener('click', enterWalk);
+  viewBtn?.addEventListener('click', () => {
+    walk.toggleView();
+    syncView();
+  });
+  prompt?.addEventListener('click', () => near && showPanel(near));
+
+  $('hall-close')?.addEventListener('click', () => (walk.active ? closePanel() : backToHall()));
   $('hall-reset')?.addEventListener('click', backToHall);
   $('hall-next')?.addEventListener('click', () => focusPoster(focused + 1));
   $('hall-prev')?.addEventListener('click', () => focusPoster(focused < 0 ? -1 : focused - 1));
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && focused >= 0) backToHall();
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'Escape') {
+      if (panel && !panel.hidden && walk.active) closePanel();
+      else if (walk.active || focused >= 0) backToHall();
+      return;
+    }
+    // Any movement key starts walking.
+    if (!walk.active && isMoveKey(e.code)) enterWalk();
+    if (!walk.active) return;
+    if (walk.key(e.code, true) || e.code === 'Space') e.preventDefault();
+    if (e.code === 'KeyV' && !e.repeat) {
+      walk.toggleView();
+      syncView();
+    }
+    if (e.code === 'KeyE' && near) showPanel(near);
   });
+  window.addEventListener('keyup', (e) => walk.key(e.code, false));
+  window.addEventListener('blur', () => {
+    for (const code of ['KeyW', 'KeyA', 'KeyS', 'KeyD']) walk.key(code, false);
+  });
+
+  // Touch stick for walking on phones and tablets
+  const stick = $('hall-stick');
+  const knob = stick?.querySelector<HTMLElement>('.knob');
+  if (stick && knob) {
+    const R = 44;
+    const moveStick = (e: PointerEvent) => {
+      const rect = stick.getBoundingClientRect();
+      let x = e.clientX - (rect.left + rect.width / 2);
+      let y = e.clientY - (rect.top + rect.height / 2);
+      const len = Math.hypot(x, y);
+      if (len > R) {
+        x = (x / len) * R;
+        y = (y / len) * R;
+      }
+      knob.style.transform = `translate(${x}px, ${y}px)`;
+      walk.setStick(x / R, y / R);
+    };
+    const release = () => {
+      knob.style.transform = '';
+      walk.setStick(0, 0);
+    };
+    stick.addEventListener('pointerdown', (e) => {
+      stick.setPointerCapture(e.pointerId);
+      moveStick(e);
+    });
+    stick.addEventListener('pointermove', (e) => {
+      if (stick.hasPointerCapture(e.pointerId)) moveStick(e);
+    });
+    stick.addEventListener('pointerup', release);
+    stick.addEventListener('pointercancel', release);
+  }
 
   // Hover + click on posters (a click is a short press without dragging)
   const ray = new THREE.Raycaster();
@@ -172,12 +274,25 @@ async function start() {
     renderer.domElement.style.cursor = hovered ? 'pointer' : '';
   }
   let down: { x: number; y: number; t: number } | null = null;
+  let lastX = 0;
+  let lastY = 0;
   renderer.domElement.addEventListener('pointermove', (e) => {
+    if (walk.active && down) {
+      // Drag to look around while walking
+      walk.look(e.clientX - lastX, e.clientY - lastY);
+      lastX = e.clientX;
+      lastY = e.clientY;
+      return;
+    }
     if (e.pointerType === 'mouse') setHover(pick(e) ?? null);
   });
   renderer.domElement.addEventListener('pointerdown', (e) => {
     down = { x: e.clientX, y: e.clientY, t: performance.now() };
+    lastX = e.clientX;
+    lastY = e.clientY;
+    if (walk.active) renderer.domElement.setPointerCapture(e.pointerId);
   });
+  renderer.domElement.addEventListener('pointercancel', () => (down = null));
   renderer.domElement.addEventListener('pointerup', (e) => {
     if (!down) return;
     const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
@@ -210,9 +325,23 @@ async function start() {
   let last = performance.now();
   const b = LAYOUT.bounds;
   renderer.setAnimationLoop((now: number) => {
-    const dt = Math.min((now - last) / 1000, 0.05);
+    // Real elapsed time (capped), so walking and flights keep their speed on slow devices.
+    const dt = Math.min((now - last) / 1000, 0.25);
     last = now;
-    if (!paused) crowd.update(dt);
+    if (!paused) crowd.update(Math.min(dt, 0.1));
+    if (walk.active) {
+      walk.update(dt);
+      crowd.avoid(walk.position);
+      // "Press E" prompt for the poster in front of the player
+      const next = panel?.hidden ? walk.nearest() : null;
+      if (next !== near && prompt) {
+        near = next;
+        prompt.hidden = !near;
+        if (near) prompt.textContent = `E · Read poster ${near.info.id}: ${near.info.title}`;
+      }
+      renderer.render(scene, camera);
+      return;
+    }
     if (flight) {
       flight.t += dt / flight.duration;
       const k = ease(Math.min(1, flight.t));
