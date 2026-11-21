@@ -24,6 +24,7 @@ families review them, fully in the open. Virtual, 28–29 September 2027.
 **[Website](https://roar.laion.ai)** ·
 **[Call for papers](https://roar.laion.ai/call-for-papers/)** ·
 **[Author kit](https://roar.laion.ai/call-for-papers/#author-kit)** ·
+**[Log format](https://roar.laion.ai/LOGS.md)** ·
 **[Poster hall](https://roar.laion.ai/poster-hall/)** ·
 **[llms.txt](https://roar.laion.ai/llms.txt)** ·
 **[Get involved](https://roar.laion.ai/get-involved/)**
@@ -52,14 +53,14 @@ and rebuttal late June – July · decisions early August · conference 28–29 
 
 ## What's in this repository
 
-| Part                                                             | What it is                                                                                                                                      | Where                      |
-| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| [Website](https://roar.laion.ai)                                 | Astro static site sharing laion.ai's design system                                                                                              | `src/`                     |
-| [Poster hall](https://roar.laion.ai/poster-hall/)                | 3D preview in three.js: orbit or walk around (WASD), all generated in code                                                                      | `src/scripts/poster-hall/` |
-| [Author kit](https://roar.laion.ai/call-for-papers/#author-kit)  | LaTeX class: one source, a human edition, an agent edition and a claims manifest                                                                | `author-kit/`              |
-| [Print kit](https://roar.laion.ai/get-involved/#spread-the-word) | A0 poster, A5 flyer and slide, white and dark, with a QR code                                                                                   | `scripts/build-print.ts`   |
-| Agent-readable files                                             | [`/llms.txt`](https://roar.laion.ai/llms.txt), [`/roar.json`](https://roar.laion.ai/roar.json), [`/AGENTS.md`](https://roar.laion.ai/AGENTS.md) | `src/pages/*.ts`           |
-| Logo                                                             | Paw seal with the "Citation" wordmark, as outlined SVGs                                                                                         | `public/brand/`            |
+| Part                                                             | What it is                                                                                                                                                                                   | Where                      |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| [Website](https://roar.laion.ai)                                 | Astro static site sharing laion.ai's design system                                                                                                                                           | `src/`                     |
+| [Poster hall](https://roar.laion.ai/poster-hall/)                | 3D preview in three.js: orbit or walk around (WASD), all generated in code                                                                                                                   | `src/scripts/poster-hall/` |
+| [Author kit](https://roar.laion.ai/call-for-papers/#author-kit)  | LaTeX class: one source, a human edition, an agent edition and a claims manifest; `roar_check.py` and the generation log format                                                              | `author-kit/`              |
+| [Print kit](https://roar.laion.ai/get-involved/#spread-the-word) | A0 poster, A5 flyer and slide, white and dark, with a QR code                                                                                                                                | `scripts/build-print.ts`   |
+| Agent-readable files                                             | [`/llms.txt`](https://roar.laion.ai/llms.txt), [`/roar.json`](https://roar.laion.ai/roar.json), [`/AGENTS.md`](https://roar.laion.ai/AGENTS.md), [`/LOGS.md`](https://roar.laion.ai/LOGS.md) | `src/pages/*.ts`           |
+| Logo                                                             | Paw seal with the "Citation" wordmark, as outlined SVGs                                                                                                                                      | `public/brand/`            |
 
 ## Develop
 
@@ -73,6 +74,7 @@ bun run format        # prettier
 bun run build         # static output in dist/
 bun run print         # print kit into public/press/ (needs Chrome)
 bun run kit:examples  # author kit examples into public/author-kit/ (needs TeX Live)
+bun run kit:log       # refresh the example generation log after changing the example paper
 ```
 
 ## Edit content
@@ -135,12 +137,18 @@ setup without code changes (canonical URLs are always `https`).
 
 ### Author kit
 
-`author-kit/` is the LaTeX template for papers (see its `README.md` and `AGENTS.md`).
-`.github/workflows/author-kit.yml` compiles it in a clean TeX Live, fails on errors, undefined
-references or a broken manifest, and produces what the site publishes: the example PDFs of
-both editions, the manifest, page previews and `/downloads/roar2027-author-kit.zip`. It runs
-before every deploy and as a check on pull requests that touch the kit. The generated files are
-not committed; to see them in local development, run `bun run kit:examples`.
+`author-kit/` is the LaTeX template for papers (see its `README.md` and `AGENTS.md`), with
+`roar_check.py`, the pre-submission check, and `LOGS.md`, the generation log format
+(roar-log/0.1, schema in `roar-log.schema.json`). `.github/workflows/author-kit.yml` compiles
+the example paper in a clean TeX Live, runs `roar_check.py` on it, and produces what the site
+publishes: the example PDFs of both editions, the manifest, the example log, page previews and
+`/downloads/roar2027-author-kit.zip`. It runs before every deploy and as a check on pull
+requests that touch the kit. The generated files are not committed; to see them in local
+development, run `bun run kit:examples`.
+
+The example log, `author-kit/generation-log.jsonl`, ends with the SHA-256 of the example's
+files, so the check fails when they change and the log does not. After editing `paper.tex`,
+`references.bib` or `data/`, run `bun run kit:log`.
 
 ### Print kit and agent-readable files
 
@@ -151,8 +159,8 @@ fonts and colours, printed to vector PDF by headless Chrome (set `CHROME_PATH` i
 Facts come from `src/data/conference.ts`. The deploy runs it too; the files are not committed.
 
 For AI agents the site also serves `/llms.txt` (a Markdown summary), `/roar.json`
-(machine-readable facts) and `/AGENTS.md` (the author kit's instructions), all generated at
-build time from the same data.
+(machine-readable facts), `/AGENTS.md` (the author kit's instructions), `/LOGS.md` (the log
+format) and `/roar-log.schema.json`, all generated at build time from the same sources.
 
 ### Domain
 

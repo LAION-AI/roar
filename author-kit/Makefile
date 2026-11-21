@@ -3,13 +3,15 @@
 #   make human      paper-human.pdf
 #   make agent      paper-agent.pdf + paper-agent.roar.json
 #   make review     human edition with line numbers
+#   make check      build, then check the submission with roar_check.py
 #   make clean      remove build files
 # Use another file name with: make PAPER=mypaper
 
 PAPER   ?= paper
 LATEXMK ?= latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+PYTHON  ?= python3
 
-.PHONY: all human agent review clean
+.PHONY: all human agent review check clean
 
 all: human agent
 
@@ -21,6 +23,9 @@ agent:
 
 review:
 	$(LATEXMK) -jobname=$(PAPER)-review -usepretex='\def\roarreview{}' $(PAPER).tex
+
+check: all
+	$(PYTHON) roar_check.py --paper $(PAPER)
 
 clean:
 	for job in human agent review; do latexmk -C -jobname=$(PAPER)-$$job $(PAPER).tex; done

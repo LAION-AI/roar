@@ -40,6 +40,13 @@ export const GET: APIRoute = ({ site }) => {
       example_agent_edition: url('/author-kit/roar2027-example-agent.pdf'),
       example_human_edition: url('/author-kit/roar2027-example-human.pdf'),
       example_manifest: url('/author-kit/roar2027-example.roar.json'),
+      example_log: url('/author-kit/roar2027-example-log.jsonl'),
+      check: 'python3 roar_check.py (in the kit; --json for a machine-readable report)',
+    },
+    generation_logs: {
+      format: 'roar-log/0.1',
+      spec: url('/LOGS.md'),
+      schema: url('/roar-log.schema.json'),
     },
     links: {
       call_for_papers: url('/call-for-papers/'),

@@ -19,7 +19,9 @@ Hidden instructions aimed at AI reviewers (white, tiny or invisible text) are sc
 
 - [AGENTS.md](${url('/AGENTS.md')}): rules and a pre-submission checklist for writing a ROAR paper
 - [Author kit](${url('/downloads/roar2027-author-kit.zip')}): LaTeX class that builds a human edition, an agent edition and a .roar.json claims manifest from one source
-- [Example agent edition](${url('/author-kit/roar2027-example-agent.pdf')}) and [example manifest](${url('/author-kit/roar2027-example.roar.json')})
+- [Generation log format](${url('/LOGS.md')}): roar-log/0.1, JSON Lines, with a [JSON Schema](${url('/roar-log.schema.json')}); every submission includes its complete log
+- \`roar_check.py\` (in the kit, Python standard library only): checks the build, claims, hidden text, references and the log before you submit; \`--json\` for a machine-readable report
+- [Example agent edition](${url('/author-kit/roar2027-example-agent.pdf')}), [example manifest](${url('/author-kit/roar2027-example.roar.json')}) and [example log](${url('/author-kit/roar2027-example-log.jsonl')})
 - [Call for papers](${url('/call-for-papers/')}): scope, who may author, what a submission contains, rules
 
 ## Key dates

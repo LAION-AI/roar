@@ -8,6 +8,7 @@ check them. Humans: see `README.md`.
 - You need TeX Live with `latexmk`. On a minimal install, add the packages the kit uses:
   `tlmgr install $(sed 's/#.*//' DEPENDS.txt)`. TeX Live full and arXiv already have them.
 - Build with `make` (both editions and the manifest) or `./build.sh` if `make` is missing.
+- Check with `make check` or `python3 roar_check.py` (Python 3.8 or newer, no packages needed).
 - The class works with pdfLaTeX and LuaLaTeX. Do not switch to another document class.
 
 ## Setup
@@ -31,29 +32,46 @@ check them. Humans: see `README.md`.
   them.
 - State limitations in their own section.
 
+## Generation log
+
+Record everything you do in `generation-log.jsonl`, in the format described in `LOGS.md`
+(roar-log/0.1; schema in `roar-log.schema.json`, example in this folder):
+
+- A header with every model you use (family and exact version), your framework and the operator.
+- One record per event, in order: every operator instruction, every model call, every tool call
+  and its result, every file you write (with its SHA-256), and the compute you use.
+- A footer whose `outputs` list the files you submit, with their SHA-256. The last `file` record
+  for each of them must match: do not change a file after its last recorded write.
+- Replace API keys, passwords and personal data with `[REDACTED: reason]` and set
+  `"redacted": true`. Never delete a record.
+
 ## Not allowed
 
-- Hidden text of any kind: white or tiny text, text behind figures, invisible characters,
-  or instructions addressed to AI reviewers. The agent edition makes much of it visible, and
+- Hidden text of any kind: white or tiny text (white text even on a dark background; the check
+  cannot tell the difference), text behind figures, invisible characters, or instructions
+  addressed to AI reviewers. The agent edition makes much of it visible, and
   ROAR screens every PDF. Submissions that try it are desk-rejected.
 - Claims about results you did not produce, or numbers you cannot reproduce from the
   repository.
 - Editing the generated `.roar.json` by hand. It must come from the build.
+- Leaving things out of the generation log, editing it afterwards, or submitting files that
+  someone changed outside the log.
 
 ## Before you submit
 
-Check each item; every one of them can be verified from the build output.
+Run `make check`. It builds both editions and runs `roar_check.py`, which checks the build, the
+manifest, the LaTeX source for hidden text, the references and the generation log. Fix every
+error (`✗`); read every warning (`!`). Add `--json` for a machine-readable report and
+`--online` to look up every reference on arXiv and Crossref.
 
-- [ ] `make` finishes without errors.
-- [ ] No undefined references or citations: `grep -E "undefined on input line" *.log` prints
-      nothing.
-- [ ] Every `\roarset` field is filled in; no "(… not set)" appears on the first page.
-- [ ] `paper-agent.roar.json` lists every claim you marked, each with evidence, and every
-      figure with an `alt` description.
+The check cannot see everything. Also make sure that:
+
+- [ ] Every `\roarset` field describes your work, not the example.
 - [ ] Every URL in `logs` and `repository` is public and reachable.
 - [ ] Every number in a marked claim can be reproduced from the repository.
+- [ ] Every reference supports what you cite it for.
 
 ## Submit
 
 The human edition PDF, the agent edition PDF and the `.roar.json` manifest, all built from
-the same source, together with the full generation logs.
+the same source, together with the LaTeX source and the complete `generation-log.jsonl`.

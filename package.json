@@ -15,6 +15,7 @@
     "format:check": "prettier --check .",
     "astro": "astro",
     "kit:examples": "sh scripts/kit-examples.sh",
+    "kit:log": "bun scripts/kit-example-log.ts",
     "print": "bun scripts/build-print.ts"
   },
   "dependencies": {

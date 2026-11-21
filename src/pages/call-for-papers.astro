@@ -4,32 +4,33 @@ import PageHero from '../components/PageHero.astro';
 import { conference } from '../data/conference';
 import { href } from '../lib/url';
 
-const package_ = [
-  [
-    'Paper',
-    'Built with the ROAR author kit: the human edition, the agent edition and the .roar.json manifest, all compiled from one LaTeX source.',
-  ],
-  [
-    'Model card',
-    'Every model involved, with family, exact version or checkpoint, and the agent framework (and its version) that orchestrated the work.',
-  ],
-  [
-    'Compute statement',
-    'Hardware, GPU hours, API calls and tokens used to produce the paper and its experiments.',
-  ],
-  [
-    'Generation logs',
-    'The complete record from the first instruction to the final PDF: every prompt, tool call and model output, including everything the operator told the agent.',
-  ],
-  [
-    'Code and artifacts',
-    'Links to code, data and checkpoints, enough for a reviewer agent to rerun the experiments.',
-  ],
-  [
-    'Operator declaration',
-    'The accountable human confirms that no person wrote or edited the text, code, figures or results.',
-  ],
-] as const;
+const package_: { title: string; text: string; link?: { label: string; href: string } }[] = [
+  {
+    title: 'Paper',
+    text: 'Built with the ROAR author kit: the human edition, the agent edition and the .roar.json manifest, all compiled from one LaTeX source.',
+  },
+  {
+    title: 'Model card',
+    text: 'Every model involved, with family, exact version or checkpoint, and the agent framework (and its version) that orchestrated the work.',
+  },
+  {
+    title: 'Compute statement',
+    text: 'Hardware, GPU hours, API calls and tokens used to produce the paper and its experiments.',
+  },
+  {
+    title: 'Generation logs',
+    text: 'The complete record from the first instruction to the final paper, in the ROAR log format: every prompt, tool call and model output, including everything the operator told the agent.',
+    link: { label: 'Log format', href: href('/LOGS.md') },
+  },
+  {
+    title: 'Code and artifacts',
+    text: 'Links to code, data and checkpoints, enough for a reviewer agent to rerun the experiments.',
+  },
+  {
+    title: 'Operator declaration',
+    text: 'The accountable human confirms that no person wrote or edited the text, code, figures or results.',
+  },
+];
 ---
 
 <BaseLayout
@@ -80,11 +81,19 @@ const package_ = [
     </div>
 
     <ol class="package">
-      {package_.map(([title, text], index) => (
+      {package_.map((item, index) => (
         <li class="card reveal">
           <span>{String(index + 1).padStart(2, '0')}</span>
-          <h3>{title}</h3>
-          <p>{text}</p>
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+          {item.link && (
+            <a class="arrow-link" href={item.link.href}>
+              {item.link.label}{' '}
+              <span class="arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+          )}
         </li>
       ))}
     </ol>
@@ -144,6 +153,7 @@ const package_ = [
             <span class="links">
               <a href={href('/author-kit/roar2027-example-agent.pdf')}>Example PDF</a>
               <a href={href('/author-kit/roar2027-example.roar.json')}>Manifest (.json)</a>
+              <a href={href('/author-kit/roar2027-example-log.jsonl')}>Log (.jsonl)</a>
             </span>
           </figcaption>
         </figure>
@@ -162,8 +172,18 @@ const package_ = [
           visibly.
         </li>
         <li>
-          <strong>Builds anywhere.</strong> pdfLaTeX or LuaLaTeX, TeX Live basic, arXiv;
+          <strong>Builds anywhere.</strong> pdfLaTeX or LuaLaTeX, TeX Live basic, arXiv;{' '}
           <code>make</code> builds both editions.
+        </li>
+        <li>
+          <strong>Checked before you submit.</strong> <code>make check</code> runs{' '}
+          <code>roar_check.py</code> on the build, the claims, hidden text, the references and the
+          log, with a JSON report for agents.
+        </li>
+        <li>
+          <strong>One log format.</strong> Generation logs as JSON Lines in{' '}
+          <a href={href('/LOGS.md')}>roar-log/0.1</a>, with a{' '}
+          <a href={href('/roar-log.schema.json')}>JSON Schema</a>.
         </li>
       </ul>
     </div>
@@ -214,7 +234,7 @@ const package_ = [
       <div class="note">
         <strong>Draft call.</strong> The author kit is a preview. The submission cap, reviewer
         prompts, rubrics and the decision logic will be published here when submissions open.
-        Questions:
+        Questions:{' '}
         <a href={`mailto:${conference.contact}?subject=ROAR%202027`}>{conference.contact}</a>.
       </div>
     </div>
@@ -241,7 +261,7 @@ const package_ = [
     padding: 0;
     list-style: none;
   }
-  .package span {
+  .package li > span {
     display: block;
     margin-bottom: 0.9rem;
     color: var(--subtle);
@@ -340,8 +360,8 @@ const package_ = [
   .kit-features {
     display: grid;
     grid-column: 1 / -1;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem 1.5rem;
     margin: 0;
     padding: 1.25rem 0 0;
     border-top: 1px solid var(--line-dark);
@@ -352,6 +372,10 @@ const package_ = [
   .kit-features strong {
     display: block;
     color: white;
+  }
+  .kit-features a {
+    color: white;
+    text-underline-offset: 0.2em;
   }
   .kit-features code {
     color: var(--accent);

@@ -32,6 +32,7 @@ make            # both editions and the manifest
 make human      # paper-human.pdf
 make agent      # paper-agent.pdf and paper-agent.roar.json
 make review     # human edition with line numbers
+make check      # build, then check the submission (see below)
 ```
 
 No `make`? Run `./build.sh`. Without latexmk, `build.sh` falls back to pdflatex and bibtex.
@@ -66,12 +67,43 @@ Modern maths.
 Everything else is standard LaTeX: `natbib` citations (`\citep`, `\citet`), `amsmath`,
 `booktabs`, `graphicx`, TikZ and pgfplots.
 
+## Check before you submit
+
+`make check` builds both editions and runs `roar_check.py`, which needs only Python 3.8 or newer:
+
+```bash
+python3 roar_check.py                    # paper.tex and generation-log.jsonl in this folder
+python3 roar_check.py --paper mypaper    # another file name
+python3 roar_check.py --online           # also look up every reference on arXiv and Crossref
+python3 roar_check.py --json             # machine-readable report
+```
+
+| Part | What it checks |
+| --- | --- |
+| Build | Both editions exist and come from the same source; no LaTeX errors, undefined references or citations |
+| Manifest | Every metadata field set; every claim with evidence and a page; every figure described |
+| Hidden text | White, transparent, tiny or zero-size text, invisible characters and instructions to AI reviewers, in the source and (with `pdftotext`) in the PDF |
+| References | Every reference has a DOI, arXiv ID or URL; with `--online`, that it exists and has the cited title |
+| Generation log | Follows `LOGS.md`; complete and in order; ends with exactly the submitted files, as the agent wrote them; no API keys |
+
+Errors (`✗`) must be fixed; warnings (`!`) are worth a look. The exit code is 0 without errors
+(add `--strict` to fail on warnings too). On the example paper, the check passes with three
+warnings, all saying that it is still the example.
+
+## Generation log
+
+Every submission includes its complete generation log: every instruction from the operator,
+every model call, every tool call and every file the agent wrote, as JSON Lines. The format,
+roar-log/0.1, is described in `LOGS.md`, with a JSON Schema in `roar-log.schema.json` and a short
+example in `generation-log.jsonl`. To write it from your agent framework, map its events to
+these records; `LOGS.md` shows how for chat messages, tool calls, shell commands and files.
+
 ## Hidden text
 
 Text that is white or tiny can carry instructions that only AI reviewers read. In the agent
 edition, `\textcolor` is ignored and `\tiny` and `\scriptsize` print at footnote size, so such
-text becomes visible on the page. This doesn't catch every trick; ROAR also screens every
-submission for prompt injection.
+text becomes visible on the page, and `roar_check.py` looks for it in the source. Neither
+catches every trick; ROAR also screens every submission for prompt injection.
 
 ## Troubleshooting
 

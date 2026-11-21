@@ -1,7 +1,8 @@
 name: Author kit
 
-# Builds the LaTeX author kit in a clean TeX Live, checks it, and produces the files the site
-# publishes: the example PDFs of both editions, their manifest, page previews and the kit ZIP.
+# Builds the LaTeX author kit in a clean TeX Live, checks it with roar_check.py, and produces the
+# files the site publishes: the example PDFs of both editions, their manifest, the example log,
+# page previews and the kit ZIP.
 # Runs as a check on pull requests and branches that touch the kit, and as part of every deploy.
 
 on:
@@ -33,26 +34,16 @@ jobs:
       - name: Build both editions
         working-directory: author-kit
         run: make
-      - name: Check the build
+      - name: Install poppler
+        run: command -v pdftotext >/dev/null || sudo apt-get install -y -qq poppler-utils >/dev/null
+      - name: Check the example submission (roar check)
         working-directory: author-kit
-        run: |
-          # The final latexmk pass must have no undefined references or citations.
-          if grep -E "undefined on input line|There were undefined references" paper-human.log paper-agent.log; then
-            echo "::error::Undefined references or citations in the example paper"
-            exit 1
-          fi
-          python3 - <<'PY'
-          import json
-          d = json.load(open("paper-agent.roar.json"))
-          assert d["edition"] == "agent", d["edition"]
-          assert d["claims"] and all(c["page"] > 0 for c in d["claims"]), d["claims"]
-          assert d["figures"] and all("alt" in f for f in d["figures"]), d["figures"]
-          print(f"Manifest OK: {len(d['claims'])} claims, {len(d['figures'])} figures")
-          PY
+        # Fails on errors: LaTeX problems, a broken manifest, hidden text, or a generation log that
+        # does not end with the example's files (after changing them, run: bun run kit:log).
+        run: python3 roar_check.py
       - name: Render page previews
         working-directory: author-kit
         run: |
-          command -v pdftoppm >/dev/null || sudo apt-get install -y -qq poppler-utils >/dev/null
           for edition in human agent; do
             pdftoppm -jpeg -jpegopt quality=82 -f 1 -l 1 -scale-to-x 640 -scale-to-y -1 \
               -singlefile "paper-$edition.pdf" "example-$edition-p1"
@@ -63,10 +54,12 @@ jobs:
           cp author-kit/paper-human.pdf kit-site/author-kit/roar2027-example-human.pdf
           cp author-kit/paper-agent.pdf kit-site/author-kit/roar2027-example-agent.pdf
           cp author-kit/paper-agent.roar.json kit-site/author-kit/roar2027-example.roar.json
+          cp author-kit/generation-log.jsonl kit-site/author-kit/roar2027-example-log.jsonl
           cp author-kit/example-human-p1.jpg author-kit/example-agent-p1.jpg kit-site/author-kit/
           cd author-kit
           zip -r -X -q ../kit-site/downloads/roar2027-author-kit.zip \
-            roar2027.cls paper.tex references.bib data Makefile build.sh DEPENDS.txt README.md AGENTS.md
+            roar2027.cls paper.tex references.bib data Makefile build.sh DEPENDS.txt README.md AGENTS.md \
+            LOGS.md roar-log.schema.json roar_check.py generation-log.jsonl
           cd ..
           unzip -l kit-site/downloads/roar2027-author-kit.zip
           ls -la kit-site/author-kit

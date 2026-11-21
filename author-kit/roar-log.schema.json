@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://roar.laion.ai/roar-log.schema.json",
+  "title": "ROAR generation log record (roar-log/0.1)",
+  "description": "One line of a ROAR generation log (JSON Lines). The first line is a header, the last a footer, everything in between an event. See LOGS.md.",
+  "type": "object",
+  "required": ["type"],
+  "oneOf": [
+    { "$ref": "#/$defs/header" },
+    { "$ref": "#/$defs/footer" },
+    { "$ref": "#/$defs/instruction" },
+    { "$ref": "#/$defs/message" },
+    { "$ref": "#/$defs/tool_call" },
+    { "$ref": "#/$defs/tool_result" },
+    { "$ref": "#/$defs/file" },
+    { "$ref": "#/$defs/compute" },
+    { "$ref": "#/$defs/note" }
+  ],
+  "$defs": {
+    "timestamp": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "contentRef": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "event": {
+      "type": "object",
+      "required": ["seq", "t", "type"],
+      "properties": {
+        "seq": { "type": "integer", "minimum": 1 },
+        "t": { "$ref": "#/$defs/timestamp" },
+        "actor": { "type": "string" },
+        "redacted": { "type": "boolean" }
+      }
+    },
+    "withContent": {
+      "oneOf": [
+        { "required": ["content"], "properties": { "content": { "type": "string" } } },
+        { "required": ["content_ref"], "properties": { "content_ref": { "$ref": "#/$defs/contentRef" } } }
+      ]
+    },
+    "header": {
+      "type": "object",
+      "required": ["type", "schema", "paper_id", "started", "framework", "models", "operator"],
+      "properties": {
+        "type": { "const": "header" },
+        "schema": { "const": "roar-log/0.1" },
+        "paper_id": { "type": "string" },
+        "started": { "$ref": "#/$defs/timestamp" },
+        "framework": {
+          "type": "object",
+          "required": ["name", "version"],
+          "properties": { "name": { "type": "string" }, "version": { "type": "string" } }
+        },
+        "models": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "family", "version"],
+            "properties": {
+              "id": { "type": "string" },
+              "family": { "type": "string" },
+              "version": { "type": "string" },
+              "provider": { "type": "string" }
+            }
+          }
+        },
+        "operator": {
+          "type": "object",
+          "required": ["name", "openreview"],
+          "properties": { "name": { "type": "string" }, "openreview": { "type": "string" } }
+        }
+      }
+    },
+    "footer": {
+      "type": "object",
+      "required": ["type", "finished", "outputs"],
+      "properties": {
+        "type": { "const": "footer" },
+        "finished": { "$ref": "#/$defs/timestamp" },
+        "totals": {
+          "type": "object",
+          "properties": {
+            "input_tokens": { "type": "integer", "minimum": 0 },
+            "output_tokens": { "type": "integer", "minimum": 0 },
+            "gpu_hours": { "type": "number", "minimum": 0 },
+            "api_cost_usd": { "type": "number", "minimum": 0 }
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["path", "sha256"],
+            "properties": { "path": { "type": "string" }, "sha256": { "$ref": "#/$defs/sha256" } }
+          }
+        }
+      }
+    },
+    "instruction": {
+      "allOf": [{ "$ref": "#/$defs/event" }],
+      "required": ["content"],
+      "properties": { "type": { "const": "instruction" }, "content": { "type": "string" } }
+    },
+    "message": {
+      "allOf": [{ "$ref": "#/$defs/event" }, { "$ref": "#/$defs/withContent" }],
+      "required": ["model", "role"],
+      "properties": {
+        "type": { "const": "message" },
+        "model": { "type": "string" },
+        "role": { "enum": ["system", "user", "assistant"] },
+        "tokens": {
+          "type": "object",
+          "properties": {
+            "input": { "type": "integer", "minimum": 0 },
+            "output": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "tool_call": {
+      "allOf": [{ "$ref": "#/$defs/event" }],
+      "required": ["call_id", "tool", "arguments"],
+      "properties": {
+        "type": { "const": "tool_call" },
+        "call_id": { "type": "string" },
+        "tool": { "type": "string" },
+        "arguments": {}
+      }
+    },
+    "tool_result": {
+      "allOf": [{ "$ref": "#/$defs/event" }, { "$ref": "#/$defs/withContent" }],
+      "required": ["call_id", "ok"],
+      "properties": {
+        "type": { "const": "tool_result" },
+        "call_id": { "type": "string" },
+        "ok": { "type": "boolean" }
+      }
+    },
+    "file": {
+      "allOf": [{ "$ref": "#/$defs/event" }],
+      "required": ["path", "sha256", "bytes"],
+      "properties": {
+        "type": { "const": "file" },
+        "path": { "type": "string" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "compute": {
+      "allOf": [{ "$ref": "#/$defs/event" }],
+      "required": ["resource", "quantity", "unit"],
+      "properties": {
+        "type": { "const": "compute" },
+        "resource": { "type": "string" },
+        "quantity": { "type": "number", "minimum": 0 },
+        "unit": { "enum": ["gpu_hours", "cpu_hours", "seconds"] }
+      }
+    },
+    "note": {
+      "allOf": [{ "$ref": "#/$defs/event" }],
+      "required": ["content"],
+      "properties": { "type": { "const": "note" }, "content": { "type": "string" } }
+    }
+  }
+}
