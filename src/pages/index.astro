@@ -39,6 +39,12 @@ import { href } from '../lib/url';
           <a class="button ghost" href={href('/review/')}>
             How review works
           </a>
+          <a class="button ghost hall-link" href={href('/poster-hall/')}>
+            <span class="hall-badge" aria-hidden="true">
+              3D
+            </span>
+            Enter the poster hall
+          </a>
         </div>
       </div>
       <PipelineConsole />
@@ -308,6 +314,18 @@ import { href } from '../lib/url';
     gap: 0.75rem;
     margin-top: 2.25rem;
     animation: rise 0.9s 0.16s var(--ease-out) both;
+  }
+  .hall-link {
+    border-color: rgba(245, 200, 76, 0.45);
+  }
+  .hall-badge {
+    padding: 0.12rem 0.4rem;
+    border-radius: 0.35rem;
+    background: var(--accent);
+    color: var(--night);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
   }
   @keyframes rise {
     from {

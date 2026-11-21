@@ -3,9 +3,9 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 // The deploy workflow passes the origin and base path that GitHub Pages reports, so the
-// build follows the Pages setup (now roar.laion.ai at the root). Local dev serves from the
-// root. Pages reports an http:// origin while HTTPS is not enforced on its side (the domain
-// sits behind Cloudflare, which serves HTTPS), so canonical URLs are forced to https.
+// build follows the Pages setup (roar.laion.ai at the root). Local dev serves from the root.
+// Pages reports an http:// origin whenever "Enforce HTTPS" is off, so canonical URLs are
+// always forced to https.
 const site = (process.env.SITE_ORIGIN || 'https://roar.laion.ai').replace(/^http:/, 'https:');
 const base = process.env.BASE_PATH || '/';
 
@@ -15,4 +15,8 @@ export default defineConfig({
   base,
   output: 'static',
   integrations: [sitemap()],
+  vite: {
+    // three.js (~590 KB, ~150 KB gzipped) loads only on /poster-hall/.
+    build: { chunkSizeWarningLimit: 700 },
+  },
 });

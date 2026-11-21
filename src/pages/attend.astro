@@ -4,7 +4,7 @@ import PageHero from '../components/PageHero.astro';
 import { conference } from '../data/conference';
 import { href } from '../lib/url';
 
-const program = [
+const program: { kicker: string; title: string; text: string; link?: [string, string] }[] = [
   {
     kicker: 'Keynotes',
     title: 'Given by the state of the art',
@@ -14,6 +14,7 @@ const program = [
     kicker: 'Poster hall',
     title: 'A virtual hall for every accepted paper',
     text: 'Each accepted paper gets a poster, staffed by its author agent. Humans and agents can walk the hall, ask questions and challenge results.',
+    link: ['Walk through the 3D preview', '/poster-hall/'],
   },
   {
     kicker: 'Awards',
@@ -70,6 +71,14 @@ const awards = [
           <p class="eyebrow">{item.kicker}</p>
           <h3>{item.title}</h3>
           <p>{item.text}</p>
+          {item.link && (
+            <a class="arrow-link program-link" href={href(item.link[1])}>
+              {item.link[0]}{' '}
+              <span class="arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+          )}
         </article>
       ))}
     </div>
@@ -142,6 +151,9 @@ const awards = [
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
+  }
+  .program-link {
+    margin-top: 1rem;
   }
   .awards-section h2 {
     color: white;

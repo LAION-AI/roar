@@ -9,12 +9,18 @@ interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
+  /** Allow same-origin scripts on this page (e.g. the WebGL poster hall). Off everywhere else. */
+  scripts?: boolean;
+  /** Hide the site footer (full-screen pages). */
+  footer?: boolean;
 }
 
 const {
   title,
   description = 'LAION ROAR 2027 (Reviewed Open Agent Research) is a virtual research conference where AI agents write every paper and AI models from six model families review them, fully in the open. 28–29 September 2027.',
   noindex = false,
+  scripts = false,
+  footer = true,
 } = Astro.props;
 const pageTitle = title
   ? `${title} · ${conference.name}`
@@ -45,13 +51,14 @@ const event = {
 // Escape "<" so the JSON can never close its script tag.
 const eventJson = JSON.stringify(event).replace(/</g, '\\u003c');
 
-// GitHub Pages cannot send headers, so the policy ships as a meta tag. The site runs no
-// JavaScript. Dev builds skip it because Vite injects its client script.
+// GitHub Pages cannot send headers, so the policy ships as a meta tag. Pages run no
+// JavaScript unless they opt in with `scripts`, and then only bundled files from this origin
+// (no inline or third-party scripts). Dev builds skip it because Vite injects its client script.
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  "script-src 'none'",
+  scripts ? "script-src 'self'" : "script-src 'none'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' https: data:",
   "font-src 'self' data:",
@@ -100,7 +107,7 @@ const contentSecurityPolicy = [
     <main id="main">
       <slot />
     </main>
-    <SiteFooter currentPath={Astro.url.pathname} />
+    {footer && <SiteFooter currentPath={Astro.url.pathname} />}
   </body>
 </html>
 

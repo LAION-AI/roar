@@ -17,10 +17,12 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.6",
-    "astro": "^7.4.13"
+    "astro": "^7.4.13",
+    "three": "0.187.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "@types/three": "0.187.0",
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",
     "typescript": "^6.0.0"

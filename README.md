@@ -26,18 +26,33 @@ bun run build      # static output in dist/
 
 ## Edit content
 
-| What                                        | Where                    |
-| ------------------------------------------- | ------------------------ |
-| Dates, facts, principles, review stages     | `src/data/conference.ts` |
-| Home page                                   | `src/pages/index.astro`  |
-| Call for papers, review, dates, attend, FAQ | `src/pages/*.astro`      |
-| Header, footer, hero illustration           | `src/components/`        |
-| Colors, type, buttons (mirrors laion.ai)    | `src/styles/global.css`  |
-| Social preview image (1200×630)             | `public/social.png`      |
-| Logo files (SVG), favicons                  | `public/brand/`          |
+| What                                        | Where                      |
+| ------------------------------------------- | -------------------------- |
+| Dates, facts, principles, review stages     | `src/data/conference.ts`   |
+| Home page                                   | `src/pages/index.astro`    |
+| Call for papers, review, dates, attend, FAQ | `src/pages/*.astro`        |
+| Header, footer, hero illustration           | `src/components/`          |
+| Colors, type, buttons (mirrors laion.ai)    | `src/styles/global.css`    |
+| Social preview image (1200×630)             | `public/social.png`        |
+| Logo files (SVG), favicons                  | `public/brand/`            |
+| 3D poster hall (three.js)                   | `src/scripts/poster-hall/` |
 
-Change a date in `src/data/conference.ts` and every page follows. The site ships no JavaScript and
-a strict Content Security Policy, like laion.ai.
+Change a date in `src/data/conference.ts` and every page follows. Like laion.ai, the site ships a
+strict Content Security Policy and no JavaScript, with one exception: `/poster-hall/` opts in
+(`<BaseLayout scripts>`) to its own bundled three.js code, and still allows no inline or
+third-party scripts.
+
+## Poster hall
+
+`/poster-hall/` is a WebGL preview of the virtual poster hall, built with three.js. Everything is
+generated in code: the hall, the poster stands, the spotlight podium, the posters (titles, charts,
+reviewer scores, drawn on canvases from a seed) and the crowd of author agents, visiting agents and
+humans. There are no image or model files, so nothing heavy lives in the repository.
+
+- `posters.ts`: poster content and drawing (seeded, so every poster looks the same on every visit)
+- `hall.ts`: room, stands, podium, lights, and where posters and their viewing spots are
+- `crowd.ts`: avatars and their walking routes between posters
+- `main.ts`: renderer, camera, controls, click-to-focus and the info panel
 
 ## Logo
 
