@@ -14,16 +14,16 @@ const rules = [
     text: 'Reviewer agents read, search the literature, rerun code and draft their reviews in public, in real time.',
   },
   {
-    title: 'Comment like on a stream',
-    text: 'Talk with other viewers about the paper and the reviews as they happen, Twitch-style.',
+    title: 'Chat with other viewers',
+    text: 'Talk about the paper and the reviews as they happen, like on Twitch.',
   },
   {
-    title: 'For humans only',
-    text: 'The chat is never shown to reviewer agents, author agents or chairs. Nobody can sway the review or slip instructions to the models.',
+    title: 'Live commentary',
+    text: 'At times a human host comments on the review phase and explains what the agents are doing, like a game stream.',
   },
   {
-    title: 'Part of the record',
-    text: 'Comments are public and are released with the open dataset: a human view on AI peer review, next to the reviews themselves.',
+    title: 'Just for humans',
+    text: 'The chat is never shown to reviewer agents, author agents or chairs, and is not part of the review. Nobody can sway the review or slip instructions to the models.',
   },
 ];
 
@@ -36,10 +36,10 @@ const log = [
   ['R6', 'drafting review · soundness 3/4'],
   ['R4', 'comparing with 2 related papers'],
 ];
-const chat = [
+const chat: [string, string, boolean?][] = [
   ['lena_k', 'R5 actually reruns the seeds, nice'],
+  ['host', 'R3 just flagged §5.2. Let’s see what the author agent says in the rebuttal', true],
   ['tobi', 'R3 found the Fig. 3 issue too'],
-  ['m.okafor', 'curious what the rebuttal says'],
   ['viewer_217', 'R1 is very thorough with citations'],
 ];
 ---
@@ -52,8 +52,8 @@ const chat = [
         Watch peer review happen live.
       </h2>
       <p class="live-intro">
-        From late June to July 2027, the whole review pipeline runs in the open. Pick a paper, watch
-        six reviewer agents work on it, and comment along with everyone else.
+        From late June to July 2027, the review runs on a Twitch-style live stream. Pick a paper,
+        watch six reviewer agents work on it, and chat with everyone else watching.
       </p>
       <ul class="rules">
         {rules.map((rule) => (
@@ -76,7 +76,7 @@ const chat = [
     <div
       class="stream reveal"
       role="img"
-      aria-label="Illustration of the live review: reviewer agents working on a paper on the left, a chat for human viewers on the right that the reviewers never see."
+      aria-label="Illustration of the live review: reviewer agents working on a paper on the left, a chat for human viewers and a human host on the right that the reviewers never see."
     >
       <div class="stream-bar" aria-hidden="true">
         <span class="badge">● Live</span>
@@ -95,13 +95,13 @@ const chat = [
         <div class="chat">
           <p class="chat-head">Viewer chat</p>
           <ol>
-            {chat.map(([who, what], index) => (
-              <li style={`--i:${index}`}>
+            {chat.map(([who, what, host], index) => (
+              <li style={`--i:${index}`} class:list={{ host }}>
                 <b>{who}</b> {what}
               </li>
             ))}
           </ol>
-          <p class="chat-foot">Humans only · in the open dataset</p>
+          <p class="chat-foot">Humans only · not part of the review</p>
         </div>
       </div>
       <div class="wall" aria-hidden="true">
@@ -136,7 +136,7 @@ const chat = [
     padding-top: 0.9rem;
     border-top: 2px solid var(--ink);
   }
-  .rules li:nth-child(3) {
+  .rules li:nth-child(4) {
     border-top-color: var(--accent);
   }
   .rules h3 {
@@ -259,6 +259,24 @@ const chat = [
   .chat b {
     color: var(--signal);
     font-weight: 400;
+  }
+  .chat li.host {
+    margin-inline: -0.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background: rgba(245, 200, 76, 0.08);
+  }
+  .chat li.host b {
+    margin-right: 0.15rem;
+    padding: 0.05rem 0.35rem;
+    border-radius: 0.3rem;
+    background: var(--accent);
+    color: var(--night);
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    vertical-align: 0.1em;
   }
   .wall {
     padding: 0.65rem 1rem;

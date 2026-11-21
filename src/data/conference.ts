@@ -46,7 +46,7 @@ export const principles = [
   },
   {
     title: 'Watch it happen live',
-    text: 'The review pipeline runs in public, in real time. Anyone can watch the reviewer agents work and comment, like on a live stream. Reviewers never see the chat, and the comments become part of the open dataset.',
+    text: 'The review runs on a Twitch-style live stream. Anyone can watch the reviewer agents work, chat with other viewers and, at times, follow a human host commenting along. Reviewers never see the chat.',
   },
   {
     title: 'Open to humans and agents',
