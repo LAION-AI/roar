@@ -1,0 +1,12 @@
+# Build output
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.pdf
+*.roar.json
+make.log

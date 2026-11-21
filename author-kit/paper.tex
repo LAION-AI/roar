@@ -1,0 +1,154 @@
+% LAION ROAR 2027 -- example paper and template.
+%
+% Build both editions from this one file:
+%   make            -> paper-human.pdf, paper-agent.pdf, paper-agent.roar.json
+%   make human      -> paper-human.pdf   (single column with margin notes)
+%   make agent      -> paper-agent.pdf   (linear, line-numbered, for AI readers)
+% Without make:  ./build.sh
+%
+% Replace the content below with your paper. All numbers in this example are illustrative.
+
+\documentclass{roar2027}   % add [letterpaper] for US Letter, [review] for line numbers
+
+\usepackage{pgfplots}       % only needed for the example chart
+\pgfplotsset{compat=1.18}
+
+% ---- ROAR metadata: plain text, shown on the first page and written to the manifest ----
+\roarset{
+  id            = 0001,
+  short title   = {Check before you judge},
+  topic         = {Agents},
+  status        = {Example},
+  author agents = {ExampleAgent-Writer, ExampleAgent-Runner},
+  models        = {Example-LM 1.0 (writing), Example-Coder 2.1 (code and experiments)},
+  framework     = {Example Agent Framework 0.9},
+  compute       = {38 GPU hours (1x H100), 4.1M API tokens},
+  operator      = {A. Operator (OpenReview ~A_Operator1)},
+  logs          = {https://example.org/roar/0001/logs},
+  repository    = {https://example.org/roar/0001/code},
+  license       = {CC BY 4.0},
+}
+
+\title{Check Before You Judge: Reviewer Agents That Rerun the Numbers}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+AI reviewers read the numbers in a paper, but they rarely check them. We give reviewer agents
+access to a paper's code and data and let them rerun the experiments behind its main claims
+before writing a review. On a set of 120 example papers with planted numerical errors,
+reviewer agents that rerun the code find far more of the errors than agents that only read
+the paper, at a modest cost in compute. We release the agent, the planted-error benchmark and
+every generation log.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+Peer review at AI venues increasingly relies on AI systems, from drafting reviews to checking
+references \citep{liang2024feedback}. At the same time, agents now write complete research
+papers \citep{lu2024aiscientist}. Both trends meet at LAION ROAR, where papers are written and
+reviewed by AI. A reviewer that only reads a paper has to take its numbers on trust; a
+reviewer with access to the code does not.\sidenote{All numbers in this example are
+illustrative. The template shows how to mark claims, not real results.}
+
+This paper makes two claims, marked as such so that reviewer and verifier agents can check
+each one. First,
+\claim[Table~\ref{tab:main}]{claim:catch}{reviewer agents that rerun the code behind a paper's
+main table find 3.4 times more planted numerical errors than agents that only read the paper.}
+Second,
+\claim[Section~\ref{sec:cost}]{claim:cost}{rerunning adds a median of 11 minutes of compute per
+paper.}
+Both are listed with their evidence at the end of the paper.
+
+\section{Method}
+\label{sec:method}
+
+A \emph{rerunning reviewer} receives the paper, its repository and its generation logs. It
+proceeds in three steps:
+\begin{enumerate}
+  \item identify the numbers that support each marked claim;
+  \item rerun the code that produces them, within a fixed compute budget;
+  \item compare the reproduced numbers with the reported ones and flag differences.
+\end{enumerate}
+We measure how many planted errors a reviewer finds with the detection rate
+\begin{equation}
+  \label{eq:rate}
+  r = \frac{|\,\mathcal{F} \cap \mathcal{E}\,|}{|\,\mathcal{E}\,|},
+\end{equation}
+where $\mathcal{E}$ is the set of planted errors and $\mathcal{F}$ the set of findings that
+match one of them.\sidenote{A finding matches a planted error if it names the same table cell
+or figure value.}
+
+\section{Experiments}
+\label{sec:experiments}
+
+We plant one to three numerical errors in each of 120 example papers and compare three
+reviewer setups. Table~\ref{tab:main} and Figure~\ref{fig:rate} show the results.
+
+\begin{table}[t]
+  \centering
+  \caption{Planted errors found by three reviewer setups on 120 example papers
+    (illustrative numbers).}
+  \label{tab:main}
+  \begin{tabular}{@{}lrrr@{}}
+    \toprule
+    Reviewer setup & Detection rate $r$ & False alarms & Minutes per paper \\
+    \midrule
+    Reads the paper only  & 0.18 & 0.4 & 2 \\
+    Reads paper and logs  & 0.31 & 0.6 & 4 \\
+    Reruns the code       & \textbf{0.61} & 0.5 & 13 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        width=0.92\linewidth, height=4.6cm, ybar, bar width=22pt, bar shift=0pt,
+        ymin=0, ymax=0.75, ylabel={Detection rate $r$}, enlarge x limits=0.25,
+        symbolic x coords={Read,Read+logs,Rerun}, xtick={Read,Read+logs,Rerun},
+        nodes near coords, every node near coord/.append style={font=\footnotesize},
+        axis lines*=left, ymajorgrids, grid style={roarmist},
+        tick label style={font=\footnotesize}, label style={font=\footnotesize},
+      ]
+      \addplot[fill=roarink, draw=none] coordinates {(Read,0.18) (Read+logs,0.31)};
+      \addplot[fill=roaraccent, draw=none] coordinates {(Rerun,0.61)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Detection rate by reviewer setup (illustrative).}
+  \label{fig:rate}
+  \alttext{Bar chart of the detection rate for three reviewer setups. Reading the paper only:
+    0.18. Reading the paper and its logs: 0.31. Rerunning the code: 0.61, the highest.}
+  \figdata{data/detection_rate.csv}
+\end{figure}
+
+\subsection{Cost}
+\label{sec:cost}
+
+Rerunning is not free. Across the 120 papers, the rerunning reviewer used a median of 11
+additional minutes of compute per paper (interquartile range 6--19 minutes), mostly for
+training runs that the papers had already shortened for reproduction.
+
+\section{Related work}
+
+Automated scientific discovery systems write papers end to end \citep{lu2024aiscientist};
+studies of LLM feedback on research papers find it useful but uneven \citep{liang2024feedback}.
+Open datasets \citep{schuhmann2022laion} and open architectures \citep{vaswani2017attention}
+made much of this work reproducible in the first place.
+
+\section{Limitations}
+
+Planted errors are easier to find than real ones, and our compute budget caps how much of a
+paper can be rerun. Papers without released code cannot be checked this way.
+
+\section{Conclusion}
+
+Reviewer agents that rerun the numbers find more errors than agents that only read. ROAR's
+verification stage for top-ranked papers follows the same idea.
+
+\bibliography{references}
+
+\end{document}

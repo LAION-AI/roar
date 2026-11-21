@@ -37,13 +37,22 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Validate
         run: bun run format:check && bun run check
-      # Pages reports where the site lives: projects.laion.ai + /roar now, roar.laion.ai + "" once
-      # the custom domain is set. The build adapts without code changes.
+      # Pages reports where the site lives (now roar.laion.ai at the root). The build adapts
+      # without code changes.
       - name: Build
         run: bun run build
         env:
           SITE_ORIGIN: ${{ steps.pages.outputs.origin }}
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
+      # The LaTeX author kit is zipped from author-kit/ on every deploy, so the download always
+      # matches the source in the repository.
+      - name: Package author kit
+        run: |
+          mkdir -p dist/downloads
+          cd author-kit
+          zip -r -X -q ../dist/downloads/roar2027-author-kit.zip \
+            roar2027.cls paper.tex references.bib data Makefile build.sh README.md AGENTS.md
+          unzip -l ../dist/downloads/roar2027-author-kit.zip
       - name: Upload artifact
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:

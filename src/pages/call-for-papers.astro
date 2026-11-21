@@ -5,7 +5,10 @@ import { conference } from '../data/conference';
 import { href } from '../lib/url';
 
 const package_ = [
-  ['Paper', 'The full paper as PDF. A LaTeX template will be published when submissions open.'],
+  [
+    'Paper',
+    'Built with the ROAR author kit: the human edition, the agent edition and the .roar.json manifest, all compiled from one LaTeX source.',
+  ],
   [
     'Model card',
     'Every model involved, with family, exact version or checkpoint, and the agent framework (and its version) that orchestrated the work.',
@@ -86,6 +89,85 @@ const package_ = [
       ))}
     </ol>
 
+    <div class="kit" id="author-kit">
+      <div class="kit-intro">
+        <p class="eyebrow">Author kit · preview v0.1</p>
+        <h2>One LaTeX source. Two editions.</h2>
+        <p>
+          The ROAR author kit compiles every paper twice from the same source: a human edition
+          designed for reading, and an agent edition designed for machines. A JSON manifest lists
+          every claim with its evidence, so reviewer agents can check them without parsing the PDF.
+        </p>
+        <div class="kit-actions">
+          <a class="button accent" href={href('/downloads/roar2027-author-kit.zip')} download>
+            Download the kit (.zip)
+          </a>
+          <a class="button secondary" href={`${conference.repo}/tree/main/author-kit`}>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+      <div class="editions">
+        <figure class="edition">
+          <a href={href('/author-kit/roar2027-example-human.pdf')}>
+            <img
+              src={href('/author-kit/example-human-p1.jpg')}
+              alt="First page of the example paper, human edition: navy ROAR title band, provenance card, abstract and claim markers in the margin."
+              width="640"
+              height="905"
+              loading="lazy"
+            />
+          </a>
+          <figcaption>
+            <strong>Human edition</strong>
+            One column with a wide margin for side notes and claim markers, a provenance card on the
+            first page and a claims table at the end.
+            <span class="links">
+              <a href={href('/author-kit/roar2027-example-human.pdf')}>Example PDF</a>
+            </span>
+          </figcaption>
+        </figure>
+        <figure class="edition">
+          <a href={href('/author-kit/roar2027-example-agent.pdf')}>
+            <img
+              src={href('/author-kit/example-agent-p1.jpg')}
+              alt="First page of the example paper, agent edition: plain metadata lines, a note to AI readers, and linear text with inline claims."
+              width="640"
+              height="905"
+              loading="lazy"
+            />
+          </a>
+          <figcaption>
+            <strong>Agent edition</strong>
+            Linear text without floats, hyphenation or ligatures; claims and figure descriptions
+            inline; a note to AI readers on the first page.
+            <span class="links">
+              <a href={href('/author-kit/roar2027-example-agent.pdf')}>Example PDF</a>
+              <a href={href('/author-kit/roar2027-example.roar.json')}>Manifest (.json)</a>
+            </span>
+          </figcaption>
+        </figure>
+      </div>
+      <ul class="kit-features">
+        <li>
+          <strong>Claims you can check.</strong> <code>\claim</code> marks each result with its
+          evidence; both editions list them at the end.
+        </li>
+        <li>
+          <strong>Figures in words.</strong> <code>\alttext</code> and <code>\figdata</code> give
+          every figure a description and a data path.
+        </li>
+        <li>
+          <strong>Hidden text shows.</strong> In the agent edition, white and tiny text prints
+          visibly.
+        </li>
+        <li>
+          <strong>Builds anywhere.</strong> pdfLaTeX or LuaLaTeX, TeX Live basic, arXiv;
+          <code>make</code> builds both editions.
+        </li>
+      </ul>
+    </div>
+
     <div class="prose-roar">
       <h2 id="rules">Rules</h2>
       <ul>
@@ -130,8 +212,9 @@ const package_ = [
       </p>
 
       <div class="note">
-        <strong>Draft call.</strong> Templates, the submission cap, reviewer prompts, rubrics and
-        the decision logic will be published here when submissions open. Questions:
+        <strong>Draft call.</strong> The author kit is a preview. The submission cap, reviewer
+        prompts, rubrics and the decision logic will be published here when submissions open.
+        Questions:
         <a href={`mailto:${conference.contact}?subject=ROAR%202027`}>{conference.contact}</a>.
       </div>
     </div>
@@ -172,6 +255,120 @@ const package_ = [
   }
   @media (max-width: 560px) {
     .package {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Author kit */
+  .kit {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 2rem clamp(2rem, 4vw, 3.5rem);
+    margin-block: 2rem 1rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    border-radius: var(--radius-lg);
+    background: var(--night);
+    color: var(--on-dark);
+    scroll-margin-top: calc(var(--header-height) + 1rem);
+  }
+  .kit .eyebrow {
+    color: var(--on-dark-muted);
+  }
+  .kit h2 {
+    margin: 0;
+    color: white;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    line-height: 0.95;
+  }
+  .kit-intro > p:not(.eyebrow) {
+    margin: 1rem 0 1.5rem;
+    color: var(--on-dark-muted);
+    font-size: 1.08rem;
+  }
+  .kit-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .kit-actions .secondary {
+    border-color: rgba(255, 255, 255, 0.25);
+    color: white;
+  }
+  .editions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .edition {
+    margin: 0;
+  }
+  .edition img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.4rem;
+    box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.7);
+    transition: transform 0.2s var(--ease-out);
+  }
+  .edition a:hover img {
+    transform: translateY(-3px);
+  }
+  .edition figcaption {
+    margin-top: 0.8rem;
+    color: var(--on-dark-muted);
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+  .edition figcaption strong {
+    display: block;
+    color: white;
+    font-size: 1.05rem;
+  }
+  .edition figcaption a {
+    color: var(--accent);
+  }
+  .edition .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+  }
+  .kit-features {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 0;
+    padding: 1.25rem 0 0;
+    border-top: 1px solid var(--line-dark);
+    list-style: none;
+    color: var(--on-dark-muted);
+    font-size: 0.92rem;
+  }
+  .kit-features strong {
+    display: block;
+    color: white;
+  }
+  .kit-features code {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+  }
+  @media (max-width: 960px) {
+    .kit {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .kit-features {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .editions,
+    .kit-features {
       grid-template-columns: 1fr;
     }
   }

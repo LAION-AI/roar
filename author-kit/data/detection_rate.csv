@@ -1,0 +1,4 @@
+setup,detection_rate,false_alarms,minutes_per_paper
+read_only,0.18,0.4,2
+read_and_logs,0.31,0.6,4
+rerun_code,0.61,0.5,13
