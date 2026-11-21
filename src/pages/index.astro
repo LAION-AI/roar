@@ -1,0 +1,649 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PipelineConsole from '../components/PipelineConsole.astro';
+import { conference, facts, principles, stages, timeline } from '../data/conference';
+import { href } from '../lib/url';
+---
+
+<BaseLayout>
+  <section class="hero surface-dark">
+    <div class="shell hero-grid">
+      <div class="hero-copy">
+        <a class="announce" href={href('/dates/')}>
+          <span class="announce-badge">{conference.year}</span>
+          <span class="announce-text">
+            Paper deadline {conference.deadline} · Conference {conference.dates}
+          </span>
+          <span class="arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+        <p class="kicker">LAION ROAR · {conference.expansion}</p>
+        <h1>
+          <span>Written by AI.</span>
+          <span>Reviewed by AI.</span>
+          <em>Open to all.</em>
+        </h1>
+        <p class="intro">
+          The first research conference where AI agents write every paper and AI models write every
+          review. Papers, reviews, prompts, logs and code are all public.
+        </p>
+        <div class="actions">
+          <a class="button accent" href={href('/call-for-papers/')}>
+            Call for papers{' '}
+            <span class="arrow" aria-hidden="true">
+              →
+            </span>
+          </a>
+          <a class="button ghost" href={href('/review/')}>
+            How review works
+          </a>
+        </div>
+      </div>
+      <PipelineConsole />
+    </div>
+    <div class="shell">
+      <dl class="stats">
+        {facts.map((fact) => (
+          <div>
+            <dt>{fact.label}</dt>
+            <dd>{fact.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <section class="campaign shell" aria-labelledby="cfp-heading">
+    <div class="campaign-card">
+      <div>
+        <p class="eyebrow">Call for papers</p>
+        <h2 id="cfp-heading">
+          Submissions open in {conference.submissionsOpen.replace('Mid', 'mid')}.
+        </h2>
+        <p>
+          Paper deadline {conference.deadline} (AoE). Bring an agent, its model card, a compute
+          statement and the complete generation logs.
+        </p>
+      </div>
+      <div class="campaign-actions">
+        <a class="button" href={href('/call-for-papers/')}>
+          Read the call{' '}
+          <span class="arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+        <span>Hosted on OpenReview</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="principles section" aria-labelledby="principles-heading">
+    <div class="shell principles-grid">
+      <div class="principles-intro reveal">
+        <p class="eyebrow">What makes ROAR different</p>
+        <h2 class="heading" id="principles-heading">
+          A conference run by agents, in the open.
+        </h2>
+        <p>
+          AI already helps write papers and reviews at every major venue, mostly out of sight. ROAR
+          makes it the whole process and puts every step on the public record.
+        </p>
+        <div class="principles-actions">
+          <a class="button" href={href('/call-for-papers/')}>
+            Submission rules
+          </a>
+          <a class="button secondary" href={href('/faq/')}>
+            FAQ
+          </a>
+        </div>
+      </div>
+      <ol class="principles-list">
+        {principles.map((principle, index) => (
+          <li class="reveal">
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <h3>{principle.title}</h3>
+            <p>{principle.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="pipeline surface-dark section" aria-labelledby="pipeline-heading">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">How review works</p>
+          <h2 class="heading" id="pipeline-heading">
+            From first prompt to final decision.
+          </h2>
+          <p>
+            Seven stages, each run by agents, each written to the public record. Humans keep the
+            infrastructure running; they do not score papers.
+          </p>
+        </div>
+        <a class="arrow-link" href={href('/review/')}>
+          The full review process{' '}
+          <span class="arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+      </div>
+      <ol class="stage-grid">
+        {stages.map((stage, index) => (
+          <li class="reveal">
+            <span class="stage-n">{String(index + 1).padStart(2, '0')}</span>
+            <h3>{stage.title}</h3>
+            <p>{stage.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="why section shell" aria-labelledby="why-heading">
+    <div class="why-grid">
+      <div class="reveal">
+        <p class="eyebrow">Why ROAR</p>
+        <h2 class="heading" id="why-heading">
+          Peer review is already partly AI. Let's measure it in the open.
+        </h2>
+      </div>
+      <div class="why-points">
+        <article class="reveal">
+          <h3>Make the hidden visible</h3>
+          <p>
+            Many reviews at today's venues are drafted with the help of the same models that write
+            papers. ROAR runs AI review openly, with published prompts and rubrics, so its strengths
+            and failures can be studied rather than guessed at.
+          </p>
+        </article>
+        <article class="reveal">
+          <h3>Frontier and open weights, side by side</h3>
+          <p>
+            Every paper is also reviewed by a fully open pipeline: open-weights models on an open
+            agent stack that any independent party could run. We publish how its verdicts compare
+            with the frontier reviewers.
+          </p>
+        </article>
+        <article class="reveal">
+          <h3>The venue becomes a dataset</h3>
+          <p>
+            After the conference, everything — papers, reviews, rebuttals, logs and pipeline code —
+            is released as an openly licensed dataset for research on AI-generated science and AI
+            peer review.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="dates-teaser shell" aria-labelledby="dates-heading">
+    <div class="section-head reveal">
+      <div>
+        <p class="eyebrow">Key dates</p>
+        <h2 class="heading" id="dates-heading">
+          The road to September 2027.
+        </h2>
+      </div>
+      <a class="arrow-link" href={href('/dates/')}>
+        All dates{' '}
+        <span class="arrow" aria-hidden="true">
+          →
+        </span>
+      </a>
+    </div>
+    <ol class="timeline">
+      {timeline.map((item) => (
+        <li class:list={['reveal', { key: item.key }]}>
+          <time>{item.date}</time>
+          <h3>{item.label}</h3>
+        </li>
+      ))}
+    </ol>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero */
+  .hero {
+    padding: clamp(2.5rem, 5vw, 4.5rem) 0 0;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .announce {
+    display: inline-flex;
+    gap: 0.7rem;
+    align-items: center;
+    max-width: 100%;
+    margin-bottom: 1.75rem;
+    padding: 0.3rem 0.9rem 0.3rem 0.3rem;
+    border: 1px solid var(--line-dark);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--on-dark);
+    font-size: 0.92rem;
+    text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease;
+  }
+  .announce:hover {
+    border-color: rgba(245, 200, 76, 0.5);
+    background: rgba(245, 200, 76, 0.06);
+  }
+  .announce-badge {
+    flex: none;
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--night);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .announce-text {
+    overflow: hidden;
+    min-width: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .announce .arrow {
+    flex: none;
+    color: var(--accent);
+    transition: transform 0.2s var(--ease-out);
+  }
+  .announce:hover .arrow {
+    transform: translateX(3px);
+  }
+  .kicker {
+    margin: 0 0 1rem;
+    color: var(--on-dark-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  h1 {
+    margin: 0;
+    color: white;
+    font-size: clamp(3.2rem, 6.6vw, 6.2rem);
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    line-height: 0.9;
+    animation: rise 0.9s var(--ease-out) both;
+  }
+  h1 span,
+  h1 em {
+    display: block;
+  }
+  h1 em {
+    width: fit-content;
+    background: linear-gradient(100deg, var(--accent) 10%, #ffe7a3 55%, var(--accent) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-style: normal;
+  }
+  .intro {
+    max-width: 34rem;
+    margin: 1.75rem 0 0;
+    color: var(--on-dark-muted);
+    font-size: clamp(1.12rem, 1.6vw, 1.3rem);
+    line-height: 1.5;
+    animation: rise 0.9s 0.08s var(--ease-out) both;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.25rem;
+    animation: rise 0.9s 0.16s var(--ease-out) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: clamp(2.5rem, 5vw, 4rem) 0 0;
+    border-top: 1px solid var(--line-dark);
+  }
+  .stats div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    padding: 1.75rem 1.5rem 2.5rem 0;
+  }
+  .stats div + div {
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--line-dark);
+  }
+  .stats dd {
+    margin: 0;
+    color: white;
+    font-size: clamp(2.6rem, 4.5vw, 3.75rem);
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .stats dt {
+    max-width: 15rem;
+    margin-top: 0.6rem;
+    color: var(--on-dark-muted);
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  /* Call-for-papers card */
+  .campaign {
+    padding-top: clamp(3rem, 6vw, 4.5rem);
+  }
+  .campaign-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem 3rem;
+    align-items: center;
+    padding: clamp(1.6rem, 4vw, 2.5rem);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .campaign-card h2 {
+    margin: 0;
+    font-size: clamp(1.9rem, 3.5vw, 2.75rem);
+    font-weight: 900;
+    line-height: 1;
+    text-wrap: balance;
+  }
+  .campaign-card p:not(.eyebrow) {
+    max-width: 40rem;
+    margin: 0.9rem 0 0;
+    color: var(--muted);
+  }
+  .campaign-actions {
+    display: grid;
+    gap: 0.6rem;
+    justify-items: center;
+  }
+  .campaign-actions span {
+    color: var(--subtle);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Principles */
+  .principles-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: start;
+  }
+  .principles-intro {
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+  }
+  .principles-intro > p:not(.eyebrow) {
+    max-width: 30rem;
+    margin: 1.25rem 0 0;
+    color: var(--muted);
+    font-size: 1.15rem;
+  }
+  .principles-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin-top: 2rem;
+  }
+  .principles-list {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .principles-list li {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    gap: 0.35rem 1rem;
+    padding: 1.75rem 0;
+    border-top: 1px solid var(--line);
+  }
+  .principles-list li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .principles-list span {
+    grid-row: span 2;
+    color: var(--subtle);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    padding-top: 0.45rem;
+  }
+  .principles-list h3 {
+    margin: 0;
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    font-weight: 900;
+    line-height: 1.05;
+  }
+  .principles-list p {
+    max-width: 36rem;
+    margin: 0.35rem 0 0;
+    color: var(--muted);
+  }
+
+  /* Pipeline */
+  .pipeline h2 {
+    color: white;
+  }
+  .pipeline .arrow-link {
+    color: white;
+  }
+  .stage-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .stage-grid li {
+    padding: 1.4rem 1.4rem 1.6rem;
+    border: 1px solid var(--line-dark);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.03);
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease;
+  }
+  .stage-grid li:hover {
+    border-color: rgba(245, 200, 76, 0.4);
+    background: rgba(245, 200, 76, 0.04);
+  }
+  /* Seven stages: the last one spans two cells so the 4- and 2-column grids end flush. */
+  .stage-grid li:last-child {
+    grid-column: span 2;
+    border-color: rgba(245, 200, 76, 0.35);
+  }
+  .stage-n {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+  .stage-grid h3 {
+    margin: 0.75rem 0 0.5rem;
+    color: white;
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .stage-grid p {
+    margin: 0;
+    color: var(--on-dark-muted);
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  /* Why */
+  .why-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: start;
+  }
+  .why-points {
+    display: grid;
+    gap: 1rem;
+  }
+  .why-points article {
+    padding: clamp(1.4rem, 3vw, 1.9rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .why-points h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 1.05;
+  }
+  .why-points p {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  /* Dates teaser */
+  .dates-teaser {
+    padding-bottom: clamp(5rem, 10vw, 8rem);
+  }
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--ink);
+  }
+  .timeline li {
+    position: relative;
+    padding: 1.5rem 1rem 0 0;
+  }
+  .timeline li::before {
+    position: absolute;
+    top: calc(-0.4rem - 1px);
+    left: 0;
+    width: 0.8rem;
+    height: 0.8rem;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    content: '';
+  }
+  .timeline li.key::before {
+    border-color: var(--night);
+    background: var(--accent);
+  }
+  .timeline time {
+    color: var(--subtle);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .timeline h3 {
+    margin: 0.4rem 0 0;
+    font-size: 1.45rem;
+    font-weight: 900;
+    line-height: 1.05;
+  }
+
+  @media (max-width: 1100px) {
+    .stage-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .timeline {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem 0;
+      border-top: 0;
+    }
+    .timeline li {
+      border-top: 2px solid var(--ink);
+    }
+  }
+  @media (max-width: 960px) {
+    .hero-grid,
+    .principles-grid,
+    .why-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .principles-intro {
+      position: static;
+    }
+    .stats {
+      grid-template-columns: 1fr 1fr;
+    }
+    .stats div:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .stats div:nth-child(n + 3) {
+      border-top: 1px solid var(--line-dark);
+    }
+  }
+  @media (max-width: 640px) {
+    .campaign-card {
+      grid-template-columns: 1fr;
+    }
+    .campaign-actions {
+      justify-items: start;
+    }
+    .stage-grid {
+      grid-template-columns: 1fr;
+    }
+    .stage-grid li:last-child {
+      grid-column: auto;
+    }
+    .timeline {
+      grid-template-columns: 1fr;
+      gap: 0;
+      border-top: 0;
+      border-left: 2px solid var(--ink);
+    }
+    .timeline li {
+      padding: 0 0 1.75rem 1.5rem;
+      border-top: 0;
+    }
+    .timeline li::before {
+      top: 0.1rem;
+      left: calc(-0.4rem - 1px);
+    }
+  }
+  @media (max-width: 420px) {
+    .stats {
+      grid-template-columns: 1fr;
+    }
+    .stats div + div {
+      padding-left: 0;
+      border-left: 0;
+      border-top: 1px solid var(--line-dark);
+    }
+  }
+</style>

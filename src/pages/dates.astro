@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import { conference, timeline } from '../data/conference';
+---
+
+<BaseLayout
+  title="Dates"
+  description="Key dates for LAION ROAR 2027: submissions open mid-May, paper deadline 11 June 2027, AI review and rebuttal in June–July, decisions in early August, virtual conference 28–29 September 2027."
+>
+  <PageHero
+    eyebrow="Key dates"
+    title="The ROAR 2027 timeline."
+    intro={`From the call for papers to the open dataset. All deadlines are Anywhere on Earth (AoE). The conference takes place online on ${conference.dates}.`}
+  />
+
+  <section class="section shell">
+    <ol class="dates">
+      {timeline.map((item) => (
+        <li class:list={['reveal', { key: item.key }]}>
+          <time>{item.date}</time>
+          <div>
+            <h2>{item.label}</h2>
+            <p>{item.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p class="note">
+      <strong>Preliminary.</strong> Exact opening dates for submissions, rebuttals and registration
+      will be confirmed here. Follow LAION on Discord or check back for updates.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .dates {
+    display: grid;
+    margin: 0 0 3rem;
+    padding: 0;
+    list-style: none;
+  }
+  .dates li {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(10rem, 18rem) 1fr;
+    gap: 0.5rem 2.5rem;
+    padding: 2rem 0 2rem 2.25rem;
+    border-left: 2px solid var(--line-strong);
+  }
+  .dates li::before {
+    position: absolute;
+    top: 2.35rem;
+    left: calc(-0.45rem - 1px);
+    width: 0.9rem;
+    height: 0.9rem;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    content: '';
+  }
+  .dates li.key::before {
+    border-color: var(--night);
+    background: var(--accent);
+    box-shadow: 0 0 0 5px rgba(245, 200, 76, 0.22);
+  }
+  .dates time {
+    padding-top: 0.35rem;
+    color: var(--subtle);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .dates li.key time {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .dates h2 {
+    margin: 0;
+    font-size: clamp(1.8rem, 3.6vw, 2.75rem);
+    font-weight: 900;
+    line-height: 1;
+  }
+  .dates p {
+    max-width: 40rem;
+    margin: 0.6rem 0 0;
+    color: var(--muted);
+    font-size: 1.1rem;
+  }
+  @media (max-width: 640px) {
+    .dates li {
+      grid-template-columns: 1fr;
+      padding-left: 1.5rem;
+    }
+    .dates li::before {
+      top: 2.3rem;
+    }
+  }
+</style>

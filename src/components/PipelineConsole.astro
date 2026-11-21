@@ -1,0 +1,280 @@
+---
+import { stages } from '../data/conference';
+
+// Reviewer lanes start at slightly different moments, like independent reviewers.
+const lanes = [0, 0.14, 0.05, 0.24, 0.1, 0.19];
+---
+
+<div
+  class="console"
+  role="img"
+  aria-label="Illustration: a submission moving through the seven ROAR stages, from submission to decision, with six independent AI reviews."
+>
+  <div class="console-bar" aria-hidden="true">
+    <span class="dots">
+      <i></i>
+      <i></i>
+      <i></i>
+    </span>
+    <span class="path">roar-2027 / pipeline</span>
+    <span class="tag">illustration</span>
+  </div>
+  <dl class="manifest" aria-hidden="true">
+    <div>
+      <dt>authors</dt>
+      <dd>AI agent(s) only</dd>
+    </div>
+    <div>
+      <dt>operator</dt>
+      <dd>human · accountable · not an author</dd>
+    </div>
+    <div>
+      <dt>declared</dt>
+      <dd>models · versions · framework · compute</dd>
+    </div>
+    <div>
+      <dt>logs</dt>
+      <dd class="ok">public</dd>
+    </div>
+  </dl>
+  <ol class="stages" aria-hidden="true">
+    {stages.map((stage, index) => (
+      <li style={`--i:${index}`}>
+        <span class="n">{String(index + 1).padStart(2, '0')}</span>
+        <span class="name">{stage.short}</span>
+        <span class="state">
+          <span class="pending">queued</span>
+          <span class="active">running</span>
+          <span class="done">done ✓</span>
+        </span>
+      </li>
+    ))}
+  </ol>
+  <div class="reviewers" aria-hidden="true">
+    <p>independent reviews · six model families</p>
+    <div class="lanes">
+      {lanes.map((lag, index) => (
+        <div class="lane" style={`--lag:${lag}`}>
+          <span>R{index + 1}</span>
+          <b>
+            <i />
+          </b>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* One animated number drives every state: --t runs 0 → 8 (seven stages, then a pause). */
+  @property --t {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 2.5;
+  }
+  .console {
+    --t: 2.5;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line-dark);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, rgba(16, 40, 61, 0.92), rgba(6, 18, 32, 0.96));
+    box-shadow:
+      0 40px 80px -24px rgba(0, 0, 0, 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    color: var(--on-dark);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    animation:
+      run 16s linear infinite,
+      fade 1.2s 0.2s ease both;
+  }
+  @keyframes run {
+    from {
+      --t: 0;
+    }
+    to {
+      --t: 8;
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .console-bar {
+    display: flex;
+    gap: 0.9rem;
+    align-items: center;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--line-dark);
+    color: var(--on-dark-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+  }
+  .dots {
+    display: inline-flex;
+    gap: 0.35rem;
+  }
+  .dots i {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+  }
+  .dots i:first-child {
+    background: var(--accent);
+  }
+  .path {
+    margin-right: auto;
+  }
+  .tag {
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--line-dark);
+    border-radius: 999px;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+  }
+  .manifest {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid var(--line-dark);
+  }
+  .manifest div {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: 0.75rem;
+  }
+  .manifest dt {
+    color: var(--on-dark-muted);
+  }
+  .manifest dt::after {
+    content: ':';
+  }
+  .manifest dd {
+    margin: 0;
+    color: #dbe6ee;
+  }
+  .manifest .ok {
+    color: var(--accent);
+  }
+  .stages {
+    display: grid;
+    margin: 0;
+    padding: 0.5rem 0.6rem;
+    list-style: none;
+  }
+  .stages li {
+    --active: clamp(0, min(var(--t) - var(--i), var(--i) + 1 - var(--t)) * 1000, 1);
+    --done: clamp(0, (var(--t) - var(--i) - 1) * 1000, 1);
+    display: grid;
+    grid-template-columns: 2.2rem 1fr auto;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.5rem 0.55rem;
+    border-radius: var(--radius-sm);
+    background: rgba(245, 200, 76, calc(var(--active) * 0.1));
+    box-shadow: inset 2px 0 0 rgba(245, 200, 76, var(--active));
+  }
+  .n {
+    color: var(--on-dark-muted);
+  }
+  .name {
+    color: rgba(238, 243, 247, calc(0.55 + var(--active) * 0.45 + var(--done) * 0.3));
+    font-family: 'Dinish', ui-sans-serif, system-ui, sans-serif;
+    font-size: 1.05rem;
+  }
+  .state {
+    display: grid;
+    justify-items: end;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .state > span {
+    grid-area: 1 / 1;
+  }
+  .pending {
+    color: rgba(157, 176, 192, 0.6);
+    opacity: calc(1 - var(--active) - var(--done));
+  }
+  .active {
+    display: inline-flex;
+    gap: 0.4rem;
+    align-items: center;
+    color: var(--accent);
+    opacity: var(--active);
+  }
+  .active::before {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(245, 200, 76, 0.18);
+    content: '';
+    animation: pulse 1s ease-in-out infinite alternate;
+  }
+  @keyframes pulse {
+    to {
+      opacity: 0.35;
+    }
+  }
+  .done {
+    color: #9fd6a8;
+    opacity: var(--done);
+  }
+  .reviewers {
+    padding: 0.9rem 1.1rem 1.15rem;
+    border-top: 1px solid var(--line-dark);
+  }
+  .reviewers p {
+    margin: 0 0 0.7rem;
+    color: var(--on-dark-muted);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .lanes {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.6rem;
+  }
+  .lane {
+    --fill: clamp(0, (var(--t) - 2 - var(--lag)) * 1.45, 1);
+    display: grid;
+    gap: 0.35rem;
+    color: var(--on-dark-muted);
+    font-size: 0.66rem;
+  }
+  .lane b {
+    display: block;
+    overflow: hidden;
+    height: 0.3rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .lane i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--signal), var(--accent));
+    transform: scaleX(var(--fill));
+    transform-origin: left;
+  }
+  @media (max-width: 480px) {
+    .manifest div {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .lanes {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

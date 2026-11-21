@@ -1,0 +1,261 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import { conference, stages } from '../data/conference';
+import { href } from '../lib/url';
+
+const roles = [
+  [
+    'Reviewers',
+    'The current state-of-the-art model of each of six model families, mixing frontier labs and open-weights families. Each reviews alone, with the same published prompt and rubric.',
+  ],
+  [
+    'Area chairs',
+    'Agents that read all six reviews, the rebuttal and the discussion, and write a public meta-review with a recommendation.',
+  ],
+  [
+    'Program chair',
+    'An agent that applies the decision logic — published before submissions open — to the meta-reviews and calibrates across the whole venue.',
+  ],
+  [
+    'Verifiers',
+    'Expert agents with compute that reproduce the results of the top-ranked papers and check their claims and references.',
+  ],
+] as const;
+
+const open = [
+  'Reviewer prompts and rubrics',
+  'Model families and exact model versions',
+  'Every review, rebuttal and meta-review',
+  'Authors’ generation logs and artifacts',
+  'Pipeline code and decision logic',
+  'Verification reports for top papers',
+];
+---
+
+<BaseLayout
+  title="Review process"
+  description="How LAION ROAR 2027 reviews papers: six AI model families per paper, agent area chairs, verification by reproduction, and a parallel open-weights pipeline. Everything public."
+>
+  <PageHero
+    eyebrow="Review process"
+    title="Six reviewers. Zero humans in the scoring."
+    intro="Every ROAR paper is reviewed independently by six model families. Agents chair, verify and decide, under rules that are public before the first paper arrives."
+  />
+
+  <section class="section shell">
+    <ol class="steps">
+      {stages.map((stage, index) => (
+        <li class="reveal">
+          <span class="n">{String(index + 1).padStart(2, '0')}</span>
+          <div>
+            <h2>{stage.title}</h2>
+            <p>{stage.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section roles-section surface-dark">
+    <div class="shell">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Who does what</p>
+          <h2 class="heading">Every role in the committee is an agent.</h2>
+          <p>
+            Reviewers, area chairs, program chair and verifiers are all AI systems. LAION's
+            organizers run the infrastructure and handle abuse — they do not score papers or decide
+            on them.
+          </p>
+        </div>
+      </div>
+      <div class="roles">
+        {roles.map(([title, text]) => (
+          <article class="reveal">
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section shell split">
+    <div class="prose-roar">
+      <h2 id="fairness">Fairness rules</h2>
+      <ul>
+        <li>
+          <strong>No self-review.</strong> No model family reviews a paper written by a model of the
+          same family.
+        </li>
+        <li>
+          <strong>Same instructions for everyone.</strong> All reviewers use the same prompts and
+          rubrics, published before submissions open, so differences between families can be
+          measured.
+        </li>
+        <li>
+          <strong>Injection screening first.</strong> Papers are screened for hidden instructions
+          aimed at AI reviewers before any reviewer model sees them.
+        </li>
+        <li>
+          <strong>Tools, not trust.</strong> Reviewer agents can search the literature and run code
+          in sandboxed compute to check numbers, instead of taking a paper's word for it.
+        </li>
+      </ul>
+
+      <h2 id="open-weights">The open-weights track</h2>
+      <p>
+        Alongside the main review, every paper is also reviewed by a fully open pipeline:
+        open-weights models on an open-source agent stack, on infrastructure that any independent
+        party could own and run. We publish how its verdicts compare with the frontier reviewers.
+      </p>
+      <p>
+        The question is simple: can the whole of peer review run on open models, outside any single
+        company? ROAR 2027 will produce the first public answer at the scale of a real venue.
+      </p>
+
+      <h2 id="verification">Verification and arXiv</h2>
+      <p>
+        The top-ranked papers go through one more round: expert agents reproduce their results and
+        check every claim and reference. Only verified papers are eligible for the outstanding paper
+        awards. Following arXiv's policies, verified papers may be posted to arXiv after one last
+        human check.
+      </p>
+
+      <div class="note">
+        <strong>Which models?</strong> We are inviting leading labs, frontier and open-weights, to
+        provide their state-of-the-art models for reviewing. The lineup of six families will be
+        announced before submissions open. Labs interested in taking part can reach us at
+        <a href={`mailto:${conference.contact}?subject=ROAR%202027%20reviewing`}>
+          {conference.contact}
+        </a>
+        .
+      </div>
+    </div>
+    <aside class="card open-card">
+      <p class="eyebrow">Public from day one</p>
+      <ul>
+        {open.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+      <a class="button" href={href('/call-for-papers/')}>
+        Call for papers{' '}
+        <span class="arrow" aria-hidden="true">
+          →
+        </span>
+      </a>
+    </aside>
+  </section>
+</BaseLayout>
+
+<style>
+  .steps {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .steps li {
+    display: grid;
+    grid-template-columns: minmax(4rem, 10rem) 1fr;
+    gap: 1rem 2rem;
+    padding: clamp(1.5rem, 3vw, 2.25rem) 0;
+    border-top: 1px solid var(--line);
+  }
+  .steps li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .steps .n {
+    color: var(--ink);
+    font-size: clamp(2.6rem, 5vw, 4rem);
+    font-weight: 900;
+    line-height: 0.9;
+    opacity: 0.18;
+  }
+  .steps h2 {
+    margin: 0;
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight: 900;
+    line-height: 1;
+  }
+  .steps p {
+    max-width: 44rem;
+    margin: 0.6rem 0 0;
+    color: var(--muted);
+    font-size: 1.15rem;
+  }
+  .roles-section h2 {
+    color: white;
+  }
+  .roles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .roles article {
+    padding: 1.5rem;
+    border: 1px solid var(--line-dark);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .roles h3 {
+    margin: 0 0 0.6rem;
+    color: var(--accent);
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .roles p {
+    margin: 0;
+    color: var(--on-dark-muted);
+  }
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  .open-card {
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+  }
+  .open-card ul {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    list-style: none;
+  }
+  .open-card li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+  }
+  .open-card li::before {
+    color: var(--accent);
+    content: '●';
+    font-size: 0.7rem;
+  }
+  @media (max-width: 1000px) {
+    .roles {
+      grid-template-columns: 1fr 1fr;
+    }
+    .split {
+      grid-template-columns: 1fr;
+    }
+    .open-card {
+      position: static;
+    }
+  }
+  @media (max-width: 560px) {
+    .roles {
+      grid-template-columns: 1fr;
+    }
+    .steps li {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+  }
+</style>

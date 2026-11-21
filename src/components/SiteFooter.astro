@@ -1,0 +1,235 @@
+---
+import { conference } from '../data/conference';
+import { href } from '../lib/url';
+
+interface Props {
+  currentPath: string;
+}
+const { currentPath } = Astro.props;
+const showCta = !currentPath.replace(/\/?$/, '/').startsWith(href('/get-involved/'));
+const columns = [
+  {
+    label: 'Conference',
+    links: [
+      ['Call for papers', href('/call-for-papers/')],
+      ['Review process', href('/review/')],
+      ['Dates', href('/dates/')],
+      ['Attend', href('/attend/')],
+      ['FAQ', href('/faq/')],
+    ],
+  },
+  {
+    label: 'Connect',
+    links: [
+      ['Get involved', href('/get-involved/')],
+      ['Email', `mailto:${conference.contact}`],
+      ['Discord', conference.discord],
+      ['GitHub', conference.repo],
+    ],
+  },
+  {
+    label: 'LAION',
+    links: [
+      ['laion.ai', conference.laion],
+      ['About LAION', `${conference.laion}/about`],
+      ['Privacy', `${conference.laion}/privacy-policy`],
+      ['Impressum', `${conference.laion}/impressum`],
+    ],
+  },
+];
+---
+
+<footer class="surface-dark">
+  {showCta && (
+    <div class="shell cta">
+      <div>
+        <p class="eyebrow">Get involved</p>
+        <h2>Help run the first conference written and reviewed by AI.</h2>
+      </div>
+      <div class="cta-actions">
+        <p>We are looking for model partners, compute, supporting researchers and volunteers.</p>
+        <div>
+          <a class="button accent" href={href('/get-involved/')}>
+            Ways to support{' '}
+            <span class="arrow" aria-hidden="true">
+              →
+            </span>
+          </a>
+          <a class="button ghost" href={conference.discord}>
+            Join our Discord
+          </a>
+        </div>
+      </div>
+    </div>
+  )}
+  <div class="shell footer-grid">
+    <div class="footer-brand">
+      <a href={href('/')} aria-label={`${conference.name} home`}>
+        <img src={href('/logo.svg')} alt="" width="40" height="40" />
+        <span>ROAR</span>
+      </a>
+      <p>
+        {conference.expansion}. A virtual conference organized by LAION e.V., a non-profit
+        association registered in Germany.
+      </p>
+    </div>
+    {columns.map((column) => (
+      <div class="column">
+        <p class="label">{column.label}</p>
+        {column.links.map(([label, link]) => (
+          <a href={link}>{label}</a>
+        ))}
+      </div>
+    ))}
+  </div>
+  <div class="shell footnote">
+    <span>
+      © {new Date().getFullYear()} LAION e.V. · {conference.name} · {conference.dates}
+    </span>
+    <a href={`mailto:${conference.contact}`}>{conference.contact}</a>
+  </div>
+  <div class="watermark" aria-hidden="true">
+    ROAR
+  </div>
+</footer>
+
+<style>
+  footer {
+    padding: clamp(4rem, 8vw, 7rem) 0 0;
+    border-top: 1px solid var(--line-dark);
+  }
+  .cta {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 2rem 4rem;
+    align-items: end;
+    padding-bottom: clamp(3.5rem, 7vw, 5.5rem);
+    border-bottom: 1px solid var(--line-dark);
+  }
+  .cta h2 {
+    max-width: 42rem;
+    margin: 0;
+    color: white;
+    font-size: clamp(2.6rem, 5.5vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 0.92;
+    text-wrap: balance;
+  }
+  .cta-actions p {
+    max-width: 28rem;
+    margin: 0 0 1.5rem;
+    color: var(--on-dark-muted);
+    font-size: 1.15rem;
+  }
+  .cta-actions div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: minmax(16rem, 1.6fr) repeat(3, 1fr);
+    gap: 3rem;
+  }
+  .cta + .footer-grid {
+    padding-top: clamp(3rem, 6vw, 4.5rem);
+  }
+  .footer-brand a {
+    display: inline-flex;
+    gap: 0.7rem;
+    align-items: center;
+    color: white;
+    font-size: 2.4rem;
+    font-weight: 900;
+    line-height: 1;
+    text-decoration: none;
+  }
+  .footer-brand img {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+  .footer-brand p {
+    max-width: 21rem;
+    margin: 1.25rem 0 0;
+    color: var(--on-dark-muted);
+    font-size: 0.98rem;
+  }
+  .label {
+    margin: 0.6rem 0 1rem;
+    color: var(--on-dark-muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .column a {
+    padding-block: 0.28rem;
+    color: #dbe5ec;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .column a:hover {
+    color: var(--accent);
+  }
+  .footnote {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    justify-content: space-between;
+    margin-top: 4rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line-dark);
+    color: var(--on-dark-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+  .footnote a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .footnote a:hover {
+    color: white;
+  }
+  .watermark {
+    margin-top: 1.5rem;
+    margin-bottom: -0.16em;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: clamp(6rem, 26vw, 24rem);
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.8;
+    text-align: center;
+    user-select: none;
+  }
+  @media (max-width: 860px) {
+    .cta {
+      grid-template-columns: 1fr;
+    }
+    .footer-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 520px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem 1rem;
+    }
+    .footnote {
+      flex-direction: column;
+    }
+  }
+</style>

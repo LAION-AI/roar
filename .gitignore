@@ -1,0 +1,16 @@
+.DS_Store
+
+# Internal notes and correspondence: never publish.
+/misc/
+
+# Build output and dependencies
+node_modules/
+dist/
+.astro/
+
+# Local env
+.env
+.env.*
+
+# Local tooling
+.claude/
