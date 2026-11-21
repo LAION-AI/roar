@@ -12,7 +12,7 @@ export const conference = {
   format: 'Virtual',
   submissionsOpen: 'Mid-May 2027',
   deadline: '11 June 2027',
-  contact: 'contact@laion.ai',
+  contact: 'roar@laion.ai',
   repo: 'https://github.com/LAION-AI/roar',
   discord: 'https://discord.com/invite/eq3cAMZtCC',
   laion: 'https://laion.ai',
