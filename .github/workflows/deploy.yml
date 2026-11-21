@@ -15,8 +15,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Compile and check the LaTeX author kit; its example PDFs, previews and ZIP go into the site.
+  author-kit:
+    uses: ./.github/workflows/author-kit.yml
+    permissions:
+      contents: read
   build:
     runs-on: ubuntu-latest
+    needs: author-kit
     permissions:
       contents: read
       pages: read
@@ -44,15 +50,15 @@ jobs:
         env:
           SITE_ORIGIN: ${{ steps.pages.outputs.origin }}
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
-      # The LaTeX author kit is zipped from author-kit/ on every deploy, so the download always
-      # matches the source in the repository.
-      - name: Package author kit
-        run: |
-          mkdir -p dist/downloads
-          cd author-kit
-          zip -r -X -q ../dist/downloads/roar2027-author-kit.zip \
-            roar2027.cls paper.tex references.bib data Makefile build.sh README.md AGENTS.md
-          unzip -l ../dist/downloads/roar2027-author-kit.zip
+      # Freshly built by the author-kit job, so the examples and the ZIP always match the source:
+      # dist/author-kit/ (example PDFs, manifest, previews) and dist/downloads/ (the kit ZIP).
+      - name: Add author kit files
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: author-kit-site
+          path: dist
+      - name: List author kit files
+        run: ls -la dist/author-kit dist/downloads
       - name: Upload artifact
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:

@@ -82,6 +82,15 @@ Every push to `main` builds and deploys to GitHub Pages via `.github/workflows/d
 workflow reads the site's origin and base path from GitHub Pages, so links follow the Pages
 setup without code changes (canonical URLs are always `https`).
 
+### Author kit
+
+`author-kit/` is the LaTeX template for papers (see its `README.md` and `AGENTS.md`).
+`.github/workflows/author-kit.yml` compiles it in a clean TeX Live, fails on errors, undefined
+references or a broken manifest, and produces what the site publishes: the example PDFs of
+both editions, the manifest, page previews and `/downloads/roar2027-author-kit.zip`. It runs
+before every deploy and as a check on pull requests that touch the kit. The generated files are
+not committed; to see them in local development, run `bun run kit:examples`.
+
 ### Domain
 
 The site lives at **roar.laion.ai**: DNS record `roar` CNAME `laion-ai.github.io` (in LAION's

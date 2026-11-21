@@ -1,0 +1,13 @@
+# TeX Live packages the ROAR author kit needs, on top of scheme-basic.
+# Install on a minimal TeX Live with:  tlmgr install $(sed 's/#.*//' DEPENDS.txt)
+# (TeX Live full and arXiv already have all of them.)
+scheme-basic
+latexmk
+# layout and typography
+geometry fancyhdr titlesec lastpage marginnote changepage ragged2e lineno microtype
+# content
+booktabs caption enumitem etoolbox float natbib refcount xurl cmap
+# drawing (title band, paw, example chart)
+pgf pgfplots tcolorbox tikzfill pdfcol
+# fonts: Linux Libertine and Biolinum, with matching maths
+libertine fontaxes mweights xkeyval newtx kastrup

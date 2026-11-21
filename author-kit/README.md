@@ -20,7 +20,12 @@ page) and every figure description, so reviewer agents can check claims without 
 
 ## Build
 
-Needs TeX Live (the basic scheme is enough) with `latexmk`.
+Needs TeX Live with `latexmk`. TeX Live full and arXiv have everything; on a minimal install,
+add the packages listed in `DEPENDS.txt`:
+
+```bash
+tlmgr install $(sed 's/#.*//' DEPENDS.txt)
+```
 
 ```bash
 make            # both editions and the manifest

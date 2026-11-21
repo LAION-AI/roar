@@ -1,0 +1,79 @@
+name: Author kit
+
+# Builds the LaTeX author kit in a clean TeX Live, checks it, and produces the files the site
+# publishes: the example PDFs of both editions, their manifest, page previews and the kit ZIP.
+# Runs as a check on pull requests and branches that touch the kit, and as part of every deploy.
+
+on:
+  workflow_call:
+  pull_request:
+    paths: ['author-kit/**', '.github/workflows/author-kit.yml']
+  push:
+    branches-ignore: [main]
+    paths: ['author-kit/**', '.github/workflows/author-kit.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  kit:
+    name: Build and check the author kit
+    runs-on: ubuntu-latest
+    steps:
+      # Actions are pinned to commit SHAs so a moved tag cannot change what runs.
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Set up TeX Live
+        uses: TeX-Live/setup-texlive-action@eb78d21f41941476d9121e3a0abcab73265c876f # v4.1.1
+        with:
+          package-file: author-kit/DEPENDS.txt
+      - name: Build both editions
+        working-directory: author-kit
+        run: make
+      - name: Check the build
+        working-directory: author-kit
+        run: |
+          # The final latexmk pass must have no undefined references or citations.
+          if grep -E "undefined on input line|There were undefined references" paper-human.log paper-agent.log; then
+            echo "::error::Undefined references or citations in the example paper"
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          d = json.load(open("paper-agent.roar.json"))
+          assert d["edition"] == "agent", d["edition"]
+          assert d["claims"] and all(c["page"] > 0 for c in d["claims"]), d["claims"]
+          assert d["figures"] and all("alt" in f for f in d["figures"]), d["figures"]
+          print(f"Manifest OK: {len(d['claims'])} claims, {len(d['figures'])} figures")
+          PY
+      - name: Render page previews
+        working-directory: author-kit
+        run: |
+          command -v pdftoppm >/dev/null || sudo apt-get install -y -qq poppler-utils >/dev/null
+          for edition in human agent; do
+            pdftoppm -jpeg -jpegopt quality=82 -f 1 -l 1 -scale-to-x 640 -scale-to-y -1 \
+              -singlefile "paper-$edition.pdf" "example-$edition-p1"
+          done
+      - name: Collect the site files
+        run: |
+          mkdir -p kit-site/author-kit kit-site/downloads
+          cp author-kit/paper-human.pdf kit-site/author-kit/roar2027-example-human.pdf
+          cp author-kit/paper-agent.pdf kit-site/author-kit/roar2027-example-agent.pdf
+          cp author-kit/paper-agent.roar.json kit-site/author-kit/roar2027-example.roar.json
+          cp author-kit/example-human-p1.jpg author-kit/example-agent-p1.jpg kit-site/author-kit/
+          cd author-kit
+          zip -r -X -q ../kit-site/downloads/roar2027-author-kit.zip \
+            roar2027.cls paper.tex references.bib data Makefile build.sh DEPENDS.txt README.md AGENTS.md
+          cd ..
+          unzip -l kit-site/downloads/roar2027-author-kit.zip
+          ls -la kit-site/author-kit
+      - name: Upload the site files
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: author-kit-site
+          path: kit-site
+          if-no-files-found: error
+          retention-days: 14

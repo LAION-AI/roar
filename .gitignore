@@ -14,3 +14,7 @@ dist/
 
 # Local tooling
 .claude/
+
+# Author kit examples are built in CI (see .github/workflows/author-kit.yml).
+# Locally: bun run kit:examples
+/public/author-kit/
