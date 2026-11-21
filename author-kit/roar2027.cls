@@ -137,8 +137,10 @@
 % The LAION paw (from laion.ai's logo, 565 x 581 units), drawn in TikZ: no image files.
 \newcommand{\roar@pawpath}{m283.055 577.939c-34.916-27.743-86.443 3.483-120.796-30.468-48.557-23.949-42.27-80.341-60.533-122.141-27.568-36.074-20.027-84.575 11.776-115.285 44.972-59.002 125.67-79.962 196.665-70.503 56.633 11.572 107.329 42.541 153.939 75.395 35.581 26.01 30.318 71.964 3.407 101.624-19.999 41.692-32.129 94.108-74.541 119.208-35.27-5.004-107.043-35.85-97.919 31.34-1.746 5.474-6.479 9.657-11.998 10.83zm-221.727-264.971c-69.14-42.894-83.433-154.054-22.345-209.822 39.518-16.292 69.501 27.56 78.556 60.599 22.119 37.43 26.995 87.936-6.792 120.269-12.986 14.382-30.296 25.17-49.419 28.954zm417.589-5.441c-34.773-19.567-83.972-57.803-61.077-102.717 22.409-34.854 39.608-89.871 86.525-95.263 43.287-3.166 61.603 44.338 61.108 80.311-1.06 43.67-18.305 93.679-58.638 115.372-8.726 3.714-18.709 4.956-27.918 2.297zm-292.611-73.851c-51.453-31.031-54.425-98.139-58.583-151.514-.819-51.446 75.558-97.595 106.014-43.205 21.012 44.82 46.033 97.519 26.744 147.259-12.196 29.544-44.894 42.327-74.175 47.46zm187.639-.236c-61.091 1.814-92.867-69.485-77.075-121.876.364-41.995 15.685-114.887 71.909-103.332 60.685 23.468 73.573 106.071 44.67 158.863-14.532 21.354-13.299 53.84-39.504 66.345z}
 % \roarpaw[colour]{height in pt}
+% Vertically centred on the capitals of the surrounding text (cap height is about 0.66em, so
+% its middle sits about 0.33em above the baseline), not standing on the baseline.
 \newcommand{\roarpaw}[2][roarink]{%
-  \tikz[baseline=(current bounding box.south)]{\pgfmathsetmacro{\roar@s}{#2/581}%
+  \tikz[baseline={([yshift=-0.33em]current bounding box.center)}]{\pgfmathsetmacro{\roar@s}{#2/581}%
     \edef\roar@tmp{\noexpand\fill[#1,scale=\roar@s,yscale=-1] svg{\roar@pawpath};}%
     \roar@tmp}}
 
@@ -232,7 +234,7 @@
       rectangle ([yshift=-17.8mm]current page.north east);
     \node[anchor=west,text=white,font=\sffamily\bfseries\large,inner sep=0pt]
       at ([xshift=20mm,yshift=-8.5mm]current page.north west)
-      {\roarpaw[roaraccent]{15}\hspace{6pt}LAION ROAR 2027\hspace{10pt}%
+      {\roarpaw[roaraccent]{13.5}\hspace{6pt}LAION ROAR 2027\hspace{10pt}%
        {\color{roarmist}\normalfont\sffamily\scriptsize Reviewed Open Agent Research}};
     \node[anchor=east,text=roarnight,font=\sffamily\scriptsize\bfseries,fill=roaraccent,
       rounded corners=2pt,inner sep=3pt]
