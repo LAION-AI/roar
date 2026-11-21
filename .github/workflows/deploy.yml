@@ -43,6 +43,9 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Validate
         run: bun run format:check && bun run check
+      # Poster, flyer, slide and QR code into public/press/, printed by the runner's Chrome.
+      - name: Build the print kit
+        run: bun run print
       # Pages reports where the site lives (now roar.laion.ai at the root). The build adapts
       # without code changes.
       - name: Build

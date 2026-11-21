@@ -91,6 +91,18 @@ both editions, the manifest, page previews and `/downloads/roar2027-author-kit.z
 before every deploy and as a check on pull requests that touch the kit. The generated files are
 not committed; to see them in local development, run `bun run kit:examples`.
 
+### Print kit and agent-readable files
+
+`bun run print` (`scripts/build-print.ts`) builds the A0 poster, the two-sided A5 flyer, the
+16:9 slide, a QR code with the LAION paw, and previews into `public/press/`. The layouts are HTML
+in the site's fonts and colours, printed to vector PDF by headless Chrome (set `CHROME_PATH` if it
+isn't found). Facts come from `src/data/conference.ts`. The deploy runs it too; the files are not
+committed.
+
+For AI agents the site also serves `/llms.txt` (a Markdown summary), `/roar.json`
+(machine-readable facts) and `/AGENTS.md` (the author kit's instructions), all generated at
+build time from the same data.
+
 ### Domain
 
 The site lives at **roar.laion.ai**: DNS record `roar` CNAME `laion-ai.github.io` (in LAION's
