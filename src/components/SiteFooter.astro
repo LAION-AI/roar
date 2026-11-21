@@ -65,8 +65,7 @@ const columns = [
   <div class="shell footer-grid">
     <div class="footer-brand">
       <a href={href('/')} aria-label={`${conference.name} home`}>
-        <img src={href('/logo.svg')} alt="" width="40" height="40" />
-        <span>ROAR</span>
+        <img src={href('/brand/roar-stacked-dark.svg')} alt="" width="176" height="180" />
       </a>
       <p>
         {conference.expansion}. A virtual conference organized by LAION e.V., a non-profit
@@ -136,18 +135,12 @@ const columns = [
     padding-top: clamp(3rem, 6vw, 4.5rem);
   }
   .footer-brand a {
-    display: inline-flex;
-    gap: 0.7rem;
-    align-items: center;
-    color: white;
-    font-size: 2.4rem;
-    font-weight: 900;
-    line-height: 1;
-    text-decoration: none;
+    display: inline-block;
   }
   .footer-brand img {
-    width: 2.4rem;
-    height: 2.4rem;
+    display: block;
+    width: 11rem;
+    height: auto;
   }
   .footer-brand p {
     max-width: 21rem;

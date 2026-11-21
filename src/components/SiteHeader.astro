@@ -21,8 +21,7 @@ const active = (path: string) => normalize(currentPath).startsWith(href(path));
 <header class="site-header">
   <div class="header-inner shell">
     <a class="brand" href={href('/')} aria-label={`${conference.name} home`}>
-      <img src={href('/logo.svg')} alt="" width="28" height="28" />
-      <span class="brand-name">ROAR</span>
+      <img src={href('/brand/roar-compact-dark.svg')} alt="" width="141" height="36" />
       <span class="brand-year">{conference.year}</span>
     </a>
     <nav class="desktop-nav" aria-label="Main navigation">
@@ -113,17 +112,13 @@ const active = (path: string) => normalize(currentPath).startsWith(href(path));
     text-decoration: none;
   }
   .brand img {
-    width: 1.75rem;
-    height: 1.75rem;
-    transition: transform 0.35s var(--ease-out);
+    display: block;
+    width: auto;
+    height: 2.25rem;
+    transition: opacity 0.2s ease;
   }
   .brand:hover img {
-    transform: rotate(-12deg) scale(1.06);
-  }
-  .brand-name {
-    font-size: 1.65rem;
-    font-weight: 900;
-    letter-spacing: 0.02em;
+    opacity: 0.85;
   }
   .brand-year {
     padding: 0.22rem 0.45rem;

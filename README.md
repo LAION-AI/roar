@@ -34,9 +34,26 @@ bun run build      # static output in dist/
 | Header, footer, hero illustration           | `src/components/`        |
 | Colors, type, buttons (mirrors laion.ai)    | `src/styles/global.css`  |
 | Social preview image (1200×630)             | `public/social.png`      |
+| Logo files (SVG), favicons                  | `public/brand/`          |
 
 Change a date in `src/data/conference.ts` and every page follows. The site ships no JavaScript and
 a strict Content Security Policy, like laion.ai.
+
+## Logo
+
+The ROAR logo pairs the LAION paw in a conference seal with the serif “Citation” wordmark, whose
+R bowls hide a closing quotation mark. All files in `public/brand/` are outlined SVGs (no font
+needed) and are served at `/brand/` on the site, so partners and press can link to them.
+
+| File                        | Use                                          |
+| --------------------------- | -------------------------------------------- |
+| `roar-lockup-{dark,light}`  | Default horizontal logo: slides, letterhead  |
+| `roar-stacked-{dark,light}` | Posters, social posts, title slides          |
+| `roar-compact-{dark,light}` | Small sizes (site header): seal without text |
+| `roar-seal-{dark,light}`    | The seal on its own                          |
+| `roar-icon`                 | Favicon and app icon                         |
+
+`dark` versions go on navy (`#061220`), `light` versions on paper (`#f6f6f4`) or white.
 
 ## Deploy
 
