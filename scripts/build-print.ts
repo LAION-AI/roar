@@ -16,6 +16,7 @@ const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const OUT = join(ROOT, 'public/press');
 const TMP = join(ROOT, 'node_modules/.cache/roar-print');
 const SITE = 'https://roar.laion.ai';
+type Theme = 'dark' | 'light';
 const file = (p: string) => pathToFileURL(join(ROOT, p)).href;
 
 // ------------------------------------------------------------------ Chrome
@@ -90,9 +91,17 @@ const base = `${fonts}
   --accent:#f5c84c; --signal:#6aa8ff; --muted:#9db0c0; --muted-ink:#536778; --line:rgba(255,255,255,.14); }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-body { font-family: Dinish, 'Helvetica Neue', Arial, sans-serif; color: #eef3f7; }
-.page { position: relative; overflow: hidden; break-after: page; }
-.dark { background: var(--night); }
+body { font-family: Dinish, 'Helvetica Neue', Arial, sans-serif; }
+.page { position: relative; overflow: hidden; break-after: page; color: var(--text); }
+/* Themes: dark (navy, for screens and showpieces) and light (white, for everyday printing). */
+.dark { background: var(--night); --text:#eef3f7; --strong:#fff; --soft:#dbe6ee; --muted:#9db0c0;
+  --line:rgba(255,255,255,.14); --card:rgba(255,255,255,.03); --hl:var(--accent); }
+.light { background: #fff; --text:var(--ink); --strong:var(--ink); --soft:#33495c; --muted:#536778;
+  --line:rgba(16,40,61,.16); --card:#fff; --hl:#9a6b0c; }
+/* On white, yellow text is too pale to read: the highlight becomes a marker stripe behind ink. */
+.light .gold { width: fit-content; color: var(--ink);
+  background: linear-gradient(transparent 56%, var(--accent) 56%, var(--accent) 90%, transparent 90%); }
+.light .qr { box-shadow: 0 0 0 1px var(--line); }
 .dark::before { content: ''; position: absolute; inset: 0; pointer-events: none;
   background-image: linear-gradient(to right, rgba(255,255,255,.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
@@ -103,7 +112,7 @@ body { font-family: Dinish, 'Helvetica Neue', Arial, sans-serif; color: #eef3f7;
     radial-gradient(45% 35% at 0% 5%, rgba(245,200,76,.09), transparent 70%); }
 .page > * { position: relative; z-index: 1; }
 .mono { font-family: ui-monospace, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
-.gold { color: var(--accent); }
+.gold { color: var(--hl); }
 h1 { font-weight: 900; letter-spacing: -.02em; line-height: .88; }
 h1 span { display: block; }
 .qr { background: #fff; display: block; }
@@ -135,7 +144,7 @@ const doc = (css: string, body: string) =>
   `<!doctype html><html lang="en"><head><meta charset="utf-8"><style>${base}${css}</style></head><body>${body}</body></html>`;
 
 // ------------------------------------------------------------------ A0 poster (841 x 1189 mm)
-function poster(qr: string, previewZoom?: number) {
+function poster(qr: string, theme: Theme, previewZoom?: number) {
   const css = `
 @page { size: 841mm 1189mm; margin: 0; }
 ${previewZoom ? `html { zoom: ${previewZoom}; }` : ''}
@@ -149,31 +158,31 @@ h1 { margin-top: 14mm; font-size: 250pt; }
 .facts { margin-top: 44mm; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1.2mm solid var(--line); }
 .facts div { padding: 14mm 10mm 0 0; }
 .facts div + div { padding-left: 12mm; border-left: 1.2mm solid var(--line); }
-.facts b { display: block; font-size: 110pt; font-weight: 900; line-height: 1; color: #fff; }
+.facts b { display: block; font-size: 110pt; font-weight: 900; line-height: 1; color: var(--strong); }
 .facts span { display: block; margin-top: 5mm; font-size: 25pt; line-height: 1.25; color: var(--muted); }
 .label { margin-top: 48mm; font-size: 22pt; color: var(--muted); }
 .steps { margin-top: 12mm; display: grid; grid-template-columns: repeat(7, 1fr); gap: 7mm; }
-.steps div { padding: 10mm 8mm 11mm; border: 1mm solid var(--line); border-radius: 8mm; background: rgba(255,255,255,.03); }
-.steps i { font-style: normal; font-size: 17pt; color: var(--accent); }
-.steps b { display: block; margin: 5mm 0 4mm; font-size: 33pt; line-height: 1; color: #fff; }
+.steps div { padding: 10mm 8mm 11mm; border: 1mm solid var(--line); border-radius: 8mm; background: var(--card); }
+.steps i { font-style: normal; font-size: 17pt; color: var(--hl); }
+.steps b { display: block; margin: 5mm 0 4mm; font-size: 33pt; line-height: 1; color: var(--strong); }
 .steps span { display: block; font-size: 17pt; line-height: 1.3; color: var(--muted); }
 .bottom { margin-top: auto; display: grid; grid-template-columns: 1fr 215mm; gap: 50mm; padding-top: 22mm; align-items: end; }
 .dates { display: grid; grid-template-columns: 1fr 1fr; gap: 9mm 20mm; }
 .dates div { border-top: 1.2mm solid var(--line); padding-top: 6mm; }
 .dates div.key { border-top-color: var(--accent); }
 .dates i { font-style: normal; font-size: 17pt; color: var(--muted); }
-.dates b { display: block; margin-top: 3mm; font-size: 40pt; line-height: 1.05; color: #fff; }
+.dates b { display: block; margin-top: 3mm; font-size: 40pt; line-height: 1.05; color: var(--strong); }
 .involve { margin-top: 18mm; display: grid; grid-template-columns: 1fr 1fr; gap: 8mm 20mm; }
-.involve b { display: block; font-size: 30pt; color: var(--accent); }
-.involve span { display: block; font-size: 25pt; color: #dbe6ee; }
+.involve b { display: block; font-size: 30pt; color: var(--hl); }
+.involve span { display: block; font-size: 25pt; color: var(--soft); }
 .qrbox { text-align: center; }
 .qrbox .qr { padding: 0; border-radius: 10mm; overflow: hidden; }
-.qrbox p { margin-top: 9mm; font-size: 56pt; font-weight: 900; color: #fff; }
+.qrbox p { margin-top: 9mm; font-size: 56pt; font-weight: 900; color: var(--strong); }
 .qrbox small { display: block; margin-top: 2mm; font-size: 20pt; color: var(--muted); }
 .foot { margin-top: 30mm; padding-top: 10mm; border-top: 1.2mm solid var(--line); display: flex; justify-content: space-between; font-size: 18pt; color: var(--muted); }`;
   const keyDates = timeline.slice(0, 5);
-  const body = `<div class="page dark">
-  <div class="top"><img src="${file('public/brand/roar-lockup-dark.svg')}" alt="LAION ROAR 2027"><span class="badge mono">Call for papers · deadline ${conference.deadline}</span></div>
+  const body = `<div class="page ${theme}">
+  <div class="top"><img src="${file(`public/brand/roar-lockup-${theme}.svg`)}" alt="LAION ROAR 2027"><span class="badge mono">Call for papers · deadline ${conference.deadline}</span></div>
   <p class="eyebrow mono">LAION ROAR 2027 · ${conference.expansion}</p>
   ${headline}
   <p class="intro">${intro}</p>
@@ -205,7 +214,7 @@ h1 { margin-top: 14mm; font-size: 250pt; }
 }
 
 // ------------------------------------------------------------------ A5 flyer (148 x 210 mm), two pages
-function flyer(qr: string, previewZoom?: number) {
+function flyer(qr: string, theme: Theme, previewZoom?: number) {
   const css = `
 @page { size: 148mm 210mm; margin: 0; }
 ${previewZoom ? `html { zoom: ${previewZoom}; } body { display: flex; gap: 6mm; background: #fff; } .page { flex: none; }` : ''}
@@ -218,10 +227,10 @@ ${previewZoom ? `html { zoom: ${previewZoom}; } body { display: flex; gap: 6mm; 
 .when div { padding-top: 3.5mm; }
 .when div + div { padding-left: 4mm; border-left: .3mm solid var(--line); }
 .when i { font-style: normal; font-size: 6pt; color: var(--muted); }
-.when b { display: block; margin-top: 1.2mm; font-size: 16pt; line-height: 1.05; color: #fff; }
+.when b { display: block; margin-top: 1.2mm; font-size: 16pt; line-height: 1.05; color: var(--strong); }
 .front .qrrow { margin-top: auto; display: flex; gap: 6mm; align-items: center; }
 .front .qr { width: 33mm; border-radius: 2mm; overflow: hidden; flex: none; }
-.front .qrrow p { font-size: 15pt; font-weight: 900; color: #fff; }
+.front .qrrow p { font-size: 15pt; font-weight: 900; color: var(--strong); }
 .front .qrrow small { display: block; margin-top: 1mm; font-size: 6.2pt; line-height: 1.5; font-weight: 400; color: var(--muted); }
 .back { background: var(--paper); color: var(--ink); }
 .back h2 { font-size: 21pt; font-weight: 900; line-height: .95; color: var(--ink); }
@@ -237,9 +246,10 @@ ${previewZoom ? `html { zoom: ${previewZoom}; } body { display: flex; gap: 6mm; 
 .back .involve b { display: block; color: var(--ink); }
 .back .involve span { color: var(--muted-ink); }
 .back .foot { margin-top: auto; padding-top: 3.5mm; border-top: .3mm solid rgba(16,40,61,.18); display: flex; justify-content: space-between; align-items: center; font-size: 6pt; color: var(--muted-ink); }
-.back .foot img { height: 9mm; }`;
-  const body = `<div class="page dark front">
-  <img class="logo" src="${file('public/brand/roar-lockup-dark.svg')}" alt="LAION ROAR 2027">
+.back .foot img { height: 9mm; }
+${theme === 'light' ? '.back { background: #fff; }' : ''}`;
+  const body = `<div class="page ${theme} front">
+  <img class="logo" src="${file(`public/brand/roar-lockup-${theme}.svg`)}" alt="LAION ROAR 2027">
   <p class="eyebrow mono">${conference.expansion}</p>
   ${headline}
   <p class="intro">${intro}</p>
@@ -262,7 +272,7 @@ ${previewZoom ? `html { zoom: ${previewZoom}; } body { display: flex; gap: 6mm; 
 }
 
 // ------------------------------------------------------------------ 16:9 slide (1920 x 1080 px)
-function slide(qr: string, previewZoom?: number) {
+function slide(qr: string, theme: Theme, previewZoom?: number) {
   const css = `
 @page { size: 1920px 1080px; margin: 0; }
 ${previewZoom ? `html { zoom: ${previewZoom}; }` : ''}
@@ -275,16 +285,16 @@ h1 { margin-top: 22px; font-size: 136px; }
 .facts { margin-top: auto; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 2px solid var(--line); }
 .facts div { padding-top: 22px; }
 .facts div + div { padding-left: 26px; border-left: 2px solid var(--line); }
-.facts b { display: block; font-size: 54px; font-weight: 900; line-height: 1; color: #fff; }
+.facts b { display: block; font-size: 54px; font-weight: 900; line-height: 1; color: var(--strong); }
 .facts span { display: block; margin-top: 8px; font-size: 20px; color: var(--muted); }
 .right { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 34px; }
 .right img { width: 330px; }
 .right .qr { width: 300px; border-radius: 16px; overflow: hidden; }
-.right p { font-size: 40px; font-weight: 900; color: #fff; text-align: center; }
+.right p { font-size: 40px; font-weight: 900; color: var(--strong); text-align: center; }
 .right small { display: block; margin-top: 6px; font-size: 16px; font-weight: 400; color: var(--muted); }`;
-  const body = `<div class="page dark">
+  const body = `<div class="page ${theme}">
   <div class="left">
-    <img src="${file('public/brand/roar-lockup-dark.svg')}" alt="LAION ROAR 2027">
+    <img src="${file(`public/brand/roar-lockup-${theme}.svg`)}" alt="LAION ROAR 2027">
     <p class="eyebrow mono">${conference.expansion}</p>
     ${headline}
     <p class="intro">${intro}</p>
@@ -295,7 +305,7 @@ h1 { margin-top: 22px; font-size: 136px; }
     </div>
   </div>
   <div class="right">
-    <img src="${file('public/brand/roar-seal-dark.svg')}" alt="">
+    <img src="${file(`public/brand/roar-seal-${theme}.svg`)}" alt="">
     <div class="qr">${qr}</div>
     <p>roar.laion.ai<small class="mono">${conference.contact}</small></p>
   </div>
@@ -316,26 +326,35 @@ const write = (name: string, html: string) => {
   writeFileSync(p, html);
   return p;
 };
-pdf(write('poster.html', poster(qr)), join(OUT, 'roar2027-poster-a0.pdf'));
-pdf(write('flyer.html', flyer(qr)), join(OUT, 'roar2027-flyer-a5.pdf'));
-const slideHtml = write('slide.html', slide(qr));
-pdf(slideHtml, join(OUT, 'roar2027-slide.pdf'));
-png(slideHtml, join(OUT, 'roar2027-slide.png'), 1920, 1080);
-
-// Previews for the website (zoomed-down screenshots of the same layouts)
+// Every piece in both themes: "-light" (white, for everyday printing) and dark (no suffix).
 const mm = 96 / 25.4;
-png(
-  write('poster-preview.html', poster(qr, 0.2)),
-  join(OUT, 'preview-poster.png'),
-  Math.round(841 * mm * 0.2),
-  Math.round(1189 * mm * 0.2),
-);
-png(
-  write('flyer-preview.html', flyer(qr, 0.8)),
-  join(OUT, 'preview-flyer.png'),
-  Math.round((296 + 6) * mm * 0.8),
-  Math.round(210 * mm * 0.8),
-);
-png(write('slide-preview.html', slide(qr, 1 / 3)), join(OUT, 'preview-slide.png'), 640, 360);
+for (const theme of ['light', 'dark'] as const) {
+  const sfx = theme === 'light' ? '-light' : '';
+  pdf(write(`poster-${theme}.html`, poster(qr, theme)), join(OUT, `roar2027-poster-a0${sfx}.pdf`));
+  pdf(write(`flyer-${theme}.html`, flyer(qr, theme)), join(OUT, `roar2027-flyer-a5${sfx}.pdf`));
+  const slideHtml = write(`slide-${theme}.html`, slide(qr, theme));
+  pdf(slideHtml, join(OUT, `roar2027-slide${sfx}.pdf`));
+  png(slideHtml, join(OUT, `roar2027-slide${sfx}.png`), 1920, 1080);
+
+  // Previews for the website (zoomed-down screenshots of the same layouts)
+  png(
+    write(`poster-preview-${theme}.html`, poster(qr, theme, 0.2)),
+    join(OUT, `preview-poster${sfx}.png`),
+    Math.round(841 * mm * 0.2),
+    Math.round(1189 * mm * 0.2),
+  );
+  png(
+    write(`flyer-preview-${theme}.html`, flyer(qr, theme, 0.8)),
+    join(OUT, `preview-flyer${sfx}.png`),
+    Math.round((296 + 6) * mm * 0.8),
+    Math.round(210 * mm * 0.8),
+  );
+  png(
+    write(`slide-preview-${theme}.html`, slide(qr, theme, 1 / 3)),
+    join(OUT, `preview-slide${sfx}.png`),
+    640,
+    360,
+  );
+}
 
 console.log(`Print kit written to ${OUT}`);
