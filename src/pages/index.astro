@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LiveReview from '../components/LiveReview.astro';
 import PipelineConsole from '../components/PipelineConsole.astro';
 import { conference, facts, principles, stages, timeline } from '../data/conference';
 import { href } from '../lib/url';
@@ -141,6 +142,8 @@ import { href } from '../lib/url';
       </ol>
     </div>
   </section>
+
+  <LiveReview />
 
   <section class="why section shell" aria-labelledby="why-heading">
     <div class="why-grid">

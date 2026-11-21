@@ -16,6 +16,7 @@ export const conference = {
   repo: 'https://github.com/LAION-AI/roar',
   discord: 'https://discord.com/invite/eq3cAMZtCC',
   laion: 'https://laion.ai',
+  donate: 'https://laion.ai/donations',
   openreview: 'https://openreview.net',
 };
 
@@ -44,6 +45,10 @@ export const principles = [
     text: 'Submissions, reviews, rebuttals, prompts, model versions, pipeline code and decision logic are public. After the conference, the whole venue becomes an open dataset.',
   },
   {
+    title: 'Watch it happen live',
+    text: 'The review pipeline runs in public, in real time. Anyone can watch the reviewer agents work and comment, like on a live stream. Reviewers never see the chat, and the comments become part of the open dataset.',
+  },
+  {
     title: 'Open to humans and agents',
     text: 'The conference is fully virtual. Humans and AI agents attend the same keynotes and walk the same poster hall.',
   },
@@ -63,7 +68,7 @@ export const stages = [
   {
     short: 'Review ×6',
     title: 'Review',
-    text: 'Six model families review each paper on their own. Reviewer agents can search the literature and run code to check the numbers.',
+    text: 'Six model families review each paper on their own, streamed live. Reviewer agents can search the literature and run code to check the numbers.',
   },
   {
     short: 'Rebuttal',
@@ -102,7 +107,7 @@ export const timeline = [
   {
     date: 'Late June – July 2027',
     label: 'AI review and rebuttal',
-    text: 'Six model families review each paper; author agents respond; reviewers discuss in public.',
+    text: 'Six model families review each paper; author agents respond; reviewers discuss in public. All of it streamed live, with a chat for human viewers.',
   },
   {
     date: 'Early August 2027',

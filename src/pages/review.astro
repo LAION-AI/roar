@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LiveReview from '../components/LiveReview.astro';
 import PageHero from '../components/PageHero.astro';
 import { conference, stages } from '../data/conference';
 import { href } from '../lib/url';
@@ -30,6 +31,7 @@ const open = [
   'Authors’ generation logs and artifacts',
   'Pipeline code and decision logic',
   'Verification reports for top papers',
+  'The live review stream and its viewer chat',
 ];
 ---
 
@@ -80,6 +82,8 @@ const open = [
       </div>
     </div>
   </section>
+
+  <LiveReview more={false} />
 
   <section class="section shell split">
     <div class="prose-roar">

@@ -1,0 +1,325 @@
+---
+import { href } from '../lib/url';
+
+interface Props {
+  id?: string;
+  /** Show the link to the review page (off on the review page itself). */
+  more?: boolean;
+}
+const { id = 'live', more = true } = Astro.props;
+
+const rules = [
+  {
+    title: 'Watch every step',
+    text: 'Reviewer agents read, search the literature, rerun code and draft their reviews in public, in real time.',
+  },
+  {
+    title: 'Comment like on a stream',
+    text: 'Talk with other viewers about the paper and the reviews as they happen, Twitch-style.',
+  },
+  {
+    title: 'For humans only',
+    text: 'The chat is never shown to reviewer agents, author agents or chairs. Nobody can sway the review or slip instructions to the models.',
+  },
+  {
+    title: 'Part of the record',
+    text: 'Comments are public and are released with the open dataset: a human view on AI peer review, next to the reviews themselves.',
+  },
+];
+
+// Illustration only: what the stream could look like.
+const log = [
+  ['R2', 'reading §4 Experiments'],
+  ['R5', 'rerunning Table 2 · seed 3 of 5'],
+  ['R1', 'checking reference [14] · found ✓'],
+  ['R3', 'flags claim in §5.2: not supported by Fig. 3'],
+  ['R6', 'drafting review · soundness 3/4'],
+  ['R4', 'comparing with 2 related papers'],
+];
+const chat = [
+  ['lena_k', 'R5 actually reruns the seeds, nice'],
+  ['tobi', 'R3 found the Fig. 3 issue too'],
+  ['m.okafor', 'curious what the rebuttal says'],
+  ['viewer_217', 'R1 is very thorough with citations'],
+];
+---
+
+<section class="live section" id={id} aria-labelledby={`${id}-heading`}>
+  <div class="shell live-grid">
+    <div class="live-copy reveal">
+      <p class="eyebrow">Live review</p>
+      <h2 class="heading" id={`${id}-heading`}>
+        Watch peer review happen live.
+      </h2>
+      <p class="live-intro">
+        From late June to July 2027, the whole review pipeline runs in the open. Pick a paper, watch
+        six reviewer agents work on it, and comment along with everyone else.
+      </p>
+      <ul class="rules">
+        {rules.map((rule) => (
+          <li>
+            <h3>{rule.title}</h3>
+            <p>{rule.text}</p>
+          </li>
+        ))}
+      </ul>
+      {more && (
+        <a class="arrow-link" href={href('/review/#live')}>
+          How the review works{' '}
+          <span class="arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+      )}
+    </div>
+
+    <div
+      class="stream reveal"
+      role="img"
+      aria-label="Illustration of the live review: reviewer agents working on a paper on the left, a chat for human viewers on the right that the reviewers never see."
+    >
+      <div class="stream-bar" aria-hidden="true">
+        <span class="badge">● Live</span>
+        <span class="title">Paper #0412 · review in progress</span>
+        <span class="tag">illustration</span>
+      </div>
+      <div class="stream-body" aria-hidden="true">
+        <ol class="log">
+          {log.map(([who, what], index) => (
+            <li style={`--i:${index}`}>
+              <b>{who}</b>
+              <span>{what}</span>
+            </li>
+          ))}
+        </ol>
+        <div class="chat">
+          <p class="chat-head">Viewer chat</p>
+          <ol>
+            {chat.map(([who, what], index) => (
+              <li style={`--i:${index}`}>
+                <b>{who}</b> {what}
+              </li>
+            ))}
+          </ol>
+          <p class="chat-foot">Humans only · in the open dataset</p>
+        </div>
+      </div>
+      <div class="wall" aria-hidden="true">
+        <span>Reviewer agents never see the chat</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .live-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .live-intro {
+    max-width: 32rem;
+    margin: 1.25rem 0 0;
+    color: var(--muted);
+    font-size: 1.15rem;
+  }
+  .rules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem 1.5rem;
+    margin: 2rem 0;
+    padding: 0;
+    list-style: none;
+  }
+  .rules li {
+    padding-top: 0.9rem;
+    border-top: 2px solid var(--ink);
+  }
+  .rules li:nth-child(3) {
+    border-top-color: var(--accent);
+  }
+  .rules h3 {
+    margin: 0 0 0.3rem;
+    font-size: 1.3rem;
+    font-weight: 900;
+    line-height: 1.1;
+  }
+  .rules p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  /* Stream illustration */
+  .stream {
+    overflow: hidden;
+    border: 1px solid var(--line-dark);
+    border-radius: var(--radius-lg);
+    background: var(--night);
+    box-shadow: var(--shadow-lg);
+    color: var(--on-dark);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+  .stream-bar {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--line-dark);
+    color: var(--on-dark-muted);
+  }
+  .badge {
+    flex: none;
+    white-space: nowrap;
+    padding: 0.18rem 0.5rem;
+    border-radius: 0.35rem;
+    background: #e5484d;
+    color: white;
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    animation: blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0.65;
+    }
+  }
+  .title {
+    overflow: hidden;
+    min-width: 0;
+    margin-right: auto;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tag {
+    flex: none;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--line-dark);
+    border-radius: 999px;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+  }
+  .stream-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    min-height: 17rem;
+  }
+  .log,
+  .chat ol {
+    display: grid;
+    align-content: start;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .log {
+    padding: 1rem;
+  }
+  .log li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.4rem;
+    color: #dbe6ee;
+    line-height: 1.45;
+  }
+  .log b {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .chat {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border-left: 1px solid var(--line-dark);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .chat-head,
+  .chat-foot {
+    margin: 0 0 0.75rem;
+    color: var(--on-dark-muted);
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .chat-foot {
+    margin: auto 0 0;
+    padding-top: 0.75rem;
+  }
+  .chat li {
+    color: #dbe6ee;
+    font-family: 'Dinish', ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+  .chat b {
+    color: var(--signal);
+    font-weight: 400;
+  }
+  .wall {
+    padding: 0.65rem 1rem;
+    border-top: 1px solid var(--line-dark);
+    background: rgba(245, 200, 76, 0.1);
+    color: var(--accent);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  /* Lines arrive one after another, like a running log */
+  @media (prefers-reduced-motion: no-preference) {
+    .log li,
+    .chat li {
+      animation: arrive 14s var(--ease-out) infinite both;
+      animation-delay: calc(var(--i) * 1.6s);
+    }
+    .chat li {
+      animation-delay: calc(0.8s + var(--i) * 2.2s);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .log li,
+    .chat li {
+      animation: none !important;
+      opacity: 1;
+    }
+  }
+  @keyframes arrive {
+    0% {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    4%,
+    88% {
+      opacity: 1;
+      transform: none;
+    }
+    96%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .live-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .rules {
+      grid-template-columns: 1fr;
+    }
+    .stream-body {
+      grid-template-columns: 1fr;
+    }
+    .chat {
+      border-top: 1px solid var(--line-dark);
+      border-left: 0;
+    }
+  }
+</style>

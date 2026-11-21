@@ -22,6 +22,7 @@ const columns = [
     label: 'Connect',
     links: [
       ['Get involved', href('/get-involved/')],
+      ['Donate', conference.donate],
       ['Email', `mailto:${conference.contact}`],
       ['Discord', conference.discord],
       ['GitHub', conference.repo],
@@ -47,7 +48,9 @@ const columns = [
         <h2>Help run the first conference written and reviewed by AI.</h2>
       </div>
       <div class="cta-actions">
-        <p>We are looking for model partners, compute, supporting researchers and volunteers.</p>
+        <p>
+          We are looking for model partners, compute, supporting researchers, volunteers and donors.
+        </p>
         <div>
           <a class="button accent" href={href('/get-involved/')}>
             Ways to support{' '}

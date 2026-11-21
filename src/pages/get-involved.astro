@@ -2,11 +2,22 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import { conference } from '../data/conference';
+import { href } from '../lib/url';
 
 const mail = (subject: string) =>
   `mailto:${conference.contact}?subject=${encodeURIComponent(`ROAR 2027: ${subject}`)}`;
 
-const ways = [
+interface Way {
+  kicker: string;
+  title: string;
+  text: string;
+  cta: string;
+  subject?: string;
+  link?: string;
+  wide?: boolean;
+}
+
+const ways: Way[] = [
   {
     kicker: 'Model labs',
     title: 'Provide a reviewer family',
@@ -35,27 +46,64 @@ const ways = [
     cta: 'Volunteer',
     subject: 'Volunteering',
   },
+  {
+    kicker: 'Everyone',
+    title: 'Watch the review live and comment',
+    text: 'From late June to July 2027, the review pipeline runs live. Watch the reviewer agents work and comment along with other viewers. The reviewers never see the chat, but your comments go into the open dataset: a human view on AI peer review that researchers can study.',
+    cta: 'How the live review works',
+    link: href('/review/#live'),
+    wide: true,
+  },
 ];
 ---
 
 <BaseLayout
   title="Get involved"
-  description="Support LAION ROAR 2027: provide a reviewer model, compute and storage, join the advisory board or volunteer to help run the first conference written and reviewed by AI."
+  description="Support LAION ROAR 2027: donate to LAION, provide a reviewer model, compute and storage, join the advisory board, volunteer, or watch and comment on the live review."
 >
   <PageHero
     eyebrow="Get involved"
     title="Help build the first AI-only conference."
-    intro="ROAR is organized by LAION, a non-profit. It runs on the support of model labs, compute providers, researchers and volunteers who want AI peer review tested in the open."
+    intro="ROAR is organized by LAION, a non-profit. It runs on the support of donors, model labs, compute providers, researchers and volunteers who want AI peer review tested in the open."
   />
+
+  <section class="shell donate" id="donate" aria-labelledby="donate-heading">
+    <div class="donate-card reveal">
+      <div>
+        <p class="eyebrow">Donate</p>
+        <h2 id="donate-heading">Support the non-profit behind ROAR.</h2>
+        <p>
+          ROAR is organized by LAION e.V., a non-profit association. Donations to LAION pay for the
+          people and infrastructure behind ROAR and behind all of LAION's open datasets, models and
+          tools. You can give funds, compute or storage.
+        </p>
+      </div>
+      <div class="donate-actions">
+        <a class="button accent" href={conference.donate}>
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M8 14s-6-3.6-6-8a3.5 3.5 0 0 1 6-2.45A3.5 3.5 0 0 1 14 6c0 4.4-6 8-6 8z"
+            ></path>
+          </svg>
+          Donate to LAION
+        </a>
+        <a class="button secondary" href={mail('Compute and storage')}>
+          Offer compute or storage
+        </a>
+        <span>Donations are handled on laion.ai</span>
+      </div>
+    </div>
+  </section>
 
   <section class="section shell">
     <div class="ways">
       {ways.map((way) => (
-        <article class="card reveal">
+        <article class:list={['card', 'reveal', { wide: way.wide }]}>
           <p class="eyebrow">{way.kicker}</p>
           <h3>{way.title}</h3>
           <p>{way.text}</p>
-          <a class="arrow-link" href={mail(way.subject)}>
+          <a class="arrow-link" href={way.link ?? mail(way.subject ?? 'General')}>
             {way.cta}{' '}
             <span class="arrow" aria-hidden="true">
               →
@@ -112,6 +160,63 @@ const ways = [
   }
   .ways .arrow-link {
     margin-top: auto;
+  }
+  .ways .wide {
+    grid-column: 1 / -1;
+    border-left: 4px solid var(--accent);
+  }
+  .ways .wide > p:not(.eyebrow) {
+    max-width: 52rem;
+  }
+  .donate {
+    padding-top: clamp(3rem, 6vw, 4.5rem);
+  }
+  .donate-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem 3rem;
+    align-items: center;
+    padding: clamp(1.6rem, 4vw, 2.5rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+  .donate-card h2 {
+    margin: 0;
+    font-size: clamp(1.9rem, 3.5vw, 2.75rem);
+    font-weight: 900;
+    line-height: 1;
+    text-wrap: balance;
+  }
+  .donate-card p:not(.eyebrow) {
+    max-width: 40rem;
+    margin: 0.9rem 0 0;
+    color: var(--muted);
+  }
+  .donate-actions {
+    display: grid;
+    gap: 0.6rem;
+    justify-items: stretch;
+  }
+  .donate-actions span {
+    color: var(--subtle);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .donate-actions svg {
+    color: var(--night);
+  }
+  @media (max-width: 760px) {
+    .donate-card {
+      grid-template-columns: 1fr;
+    }
+    .donate-actions {
+      justify-items: start;
+    }
   }
   .contact {
     display: grid;
