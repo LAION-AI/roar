@@ -6,7 +6,7 @@ and AI models from six model families review them, fully in the open.
 - **Conference:** 28–29 September 2027, virtual, open to humans and agents
 - **Paper deadline:** 11 June 2027 (AoE), submissions open mid-May 2027
 - **Reviewing platform:** OpenReview
-- **Website:** https://projects.laion.ai/roar/ (planned: https://roar.laion.ai)
+- **Website:** https://roar.laion.ai
 
 This repository holds the conference website. It is an [Astro](https://astro.build) static site
 that shares its design system (colors, Dinish typeface, components) with
@@ -58,14 +58,15 @@ needed) and are served at `/brand/` on the site, so partners and press can link 
 ## Deploy
 
 Every push to `main` builds and deploys to GitHub Pages via `.github/workflows/deploy.yml`. The
-workflow reads the site's origin and base path from GitHub Pages, so links work both under
-`projects.laion.ai/roar/` and on a custom domain without code changes.
+workflow reads the site's origin and base path from GitHub Pages, so links follow the Pages
+setup without code changes (canonical URLs are always `https`).
 
-### Switching to roar.laion.ai
+### Domain
 
-1. Add a DNS record for `laion.ai`: `roar` **CNAME** `laion-ai.github.io`.
-2. In **Settings → Pages**, set the custom domain to `roar.laion.ai` and enable **Enforce HTTPS**.
-3. Re-run the deploy workflow (or push to `main`) so the build picks up the new origin.
+The site lives at **roar.laion.ai**: DNS record `roar` CNAME `laion-ai.github.io` (in LAION's
+Cloudflare zone) and custom domain `roar.laion.ai` in **Settings → Pages**. The old address
+`projects.laion.ai/roar/` redirects there. After changing the domain, re-run the deploy workflow
+so the build picks up the new origin.
 
 ## License
 
