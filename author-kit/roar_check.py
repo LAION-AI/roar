@@ -101,8 +101,12 @@ def check_build(r, d, paper):
         try:
             a = json.loads(human_m.read_text(encoding="utf-8"))
             b = json.loads(agent_m.read_text(encoding="utf-8"))
-            a.pop("edition", None)
-            b.pop("edition", None)
+            # Each edition has its own layout, so claims may sit on different pages.
+            for m in (a, b):
+                m.pop("edition", None)
+                for claim in m.get("claims") or []:
+                    if isinstance(claim, dict):
+                        claim.pop("page", None)
             if a == b:
                 r.ok("Both editions come from the same source (their manifests match)")
             else:
@@ -132,8 +136,10 @@ def check_build(r, d, paper):
 
 # ------------------------------------------------------------------ manifest
 NOT_SET = re.compile(r"\(.*not set\)")
-FIELDS = ["title", "author_agents", "models", "framework", "compute", "operator", "logs",
-          "repository", "topic", "license"]
+FIELDS = ["title", "author_agents", "models", "framework", "compute", "operator", "steering",
+          "humans", "logs", "repository", "topic", "license"]
+# Work the agent does: an instruction after the first of these was given while it worked.
+AGENT_WORK = ("message", "tool_call", "tool_result", "file", "compute")
 
 
 def check_manifest(r, d, paper):
@@ -514,9 +520,16 @@ def check_log(r, d, paper, log_arg, manifest):
     tokens = {"input": 0, "output": 0}
     gpu_hours, redacted = 0.0, 0
     written, refs_missing = {}, []
+    working, initial, during, human_words = False, 0, 0, 0
     for i, ev in enumerate(events, 1):
         kind = ev.get("type")
         counts[kind] = counts.get(kind, 0) + 1
+        if kind == "instruction":
+            during += working
+            initial += not working
+            human_words += len(str(ev.get("content", "")).split())
+        elif kind in AGENT_WORK and not (kind == "message" and ev.get("role") in ("system", "user")):
+            working = True
         where = f"seq {ev.get('seq', '?')} (line {i + 1})"
         if kind not in EVENT_FIELDS:
             errors.append(f"{where}: unknown type {kind!r}")
@@ -574,7 +587,21 @@ def check_log(r, d, paper, log_arg, manifest):
     if calls - results:
         r.warn("Tool calls without a result", sorted(str(c) for c in calls - results))
     if not counts.get("instruction"):
-        r.warn("No operator instructions; everything the operator told the agent must be logged")
+        r.warn("No human instructions in the log; every instruction a human gave the agent must be"
+               " logged, including the first one")
+    else:
+        measured = "Steered" if during else "Autonomous"
+        summary = (f"{initial + during} human instruction(s), {human_words} words: {initial} before"
+                   f" the agent started, {during} while it worked")
+        declared = str((manifest or {}).get("steering", "")).strip()
+        if manifest and declared.lower() == "autonomous" and during:
+            r.fail("The paper says steering = Autonomous, but humans instructed the agent while it"
+                   " worked; set steering = Steered", [summary])
+        elif manifest and declared.lower() == "steered" and not during:
+            r.warn("The paper says steering = Steered, but the log has no instructions after the"
+                   " agent started; it could be labelled Autonomous", [summary])
+        else:
+            r.ok(f"Human input: {measured}", [summary])
     if refs_missing:
         r.fail("Files the log refers to (content_ref) are missing; submit them with the log", refs_missing)
     if redacted:

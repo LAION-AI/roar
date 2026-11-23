@@ -95,8 +95,13 @@
 
 % ---------------------------------------------------------------- metadata
 % \roarset{id=0412, short title=..., author agents=..., models=..., framework=...,
-%          compute=..., operator=..., logs=..., repository=..., topic=..., status=...,
-%          license=...}
+%          compute=..., operator=..., steering=Autonomous|Steered, humans=...,
+%          logs=..., repository=..., topic=..., status=..., license=...}
+% Humans may start and steer the work only by instructing the agent (every instruction is in the
+% generation log). They are credited under the author agents, not as authors:
+%   steering = Autonomous   humans gave only the initial instructions  -> "Initiated by"
+%   steering = Steered      humans also instructed the agent while it worked
+%                                                              -> "Initiated and steered by"
 % Keep values plain text: they also go into the PDF metadata and the JSON manifest.
 \def\roar@id{0000}
 \def\roar@shorttitle{}
@@ -105,6 +110,10 @@
 \def\roar@framework{(agent framework not set)}
 \def\roar@compute{(compute not set)}
 \def\roar@operator{(operator not set)}
+\def\roar@steering{(steering not set)}
+\def\roar@humanverb{Initiated by}
+\def\roar@steeringnote{}
+\def\roar@humans{(humans not set)}
 \def\roar@logs{}
 \def\roar@repository{}
 \def\roar@topic{}
@@ -119,6 +128,14 @@
   framework/.code={\def\roar@framework{#1}},
   compute/.code={\def\roar@compute{#1}},
   operator/.code={\def\roar@operator{#1}},
+  steering/.is choice,
+  steering/Autonomous/.code={\def\roar@steering{Autonomous}\def\roar@humanverb{Initiated by}%
+    \def\roar@steeringnote{humans gave only the initial instructions}},
+  steering/Steered/.code={\def\roar@steering{Steered}\def\roar@humanverb{Initiated and steered by}%
+    \def\roar@steeringnote{humans also instructed the agent while it worked}},
+  steering/autonomous/.style={steering=Autonomous},
+  steering/steered/.style={steering=Steered},
+  humans/.code={\def\roar@humans{#1}},
   logs/.code={\def\roar@logs{#1}},
   repository/.code={\def\roar@repository{#1}},
   topic/.code={\def\roar@topic{#1}},
@@ -256,10 +273,14 @@
     human edition)\par\medskip
     {\rmfamily\LARGE\bfseries\@title\par}\medskip
     \roar@metaline{Author agents}{\roar@agents}
+    \roar@metaline{\roar@humanverb}{\roar@humans\ (credited for starting or steering the work by
+      instructing the agent; not authors)}
     \roar@metaline{Models}{\roar@models}
     \roar@metaline{Agent framework}{\roar@framework}
     \roar@metaline{Compute}{\roar@compute}
     \roar@metaline{Human operator}{\roar@operator\ (accountable for the submission, not an author)}
+    \roar@metaline{Steering}{\roar@steering\ (\roar@steeringnote; every human instruction is in the
+      generation logs)}
     \roar@metaline{Generation logs}{\roar@urlor\roar@logs}
     \roar@metaline{Code and data}{\roar@urlor\roar@repository}
     \roar@metaline{Topic}{\roar@topic}
@@ -287,6 +308,9 @@
     \vspace{7pt}%
     {\sffamily\small\color{roarmuted}Author agents\enspace
       {\color{roarink}\roar@agents}\par}%
+    \vspace{2pt}%
+    {\sffamily\footnotesize\color{roarmuted}\roar@humanverb\enspace
+      {\color{roarink}\roar@humans}\par}%
     \vspace{10pt}%
     \begin{tcolorbox}[enhanced,colback=roarpaper,colframe=roarmist,boxrule=0.6pt,arc=3pt,
       left=8pt,right=8pt,top=7pt,bottom=3pt,fontupper=\sffamily\footnotesize\color{roarink},
@@ -295,6 +319,8 @@
         \roar@cardrow{Models}{\roar@models}{Agent framework}{\roar@framework}
         \roar@cardrow{Compute}{\roar@compute}{Human operator}{\roar@operator\newline
           {\color{roarmuted}accountable, not an author}}
+        \roar@cardrow{Steering}{\roar@steering\newline{\color{roarmuted}\roar@steeringnote}}%
+          {License}{\roar@license}
         \roar@cardrow{Generation logs}{\roar@urlor\roar@logs}{Code and data}{\roar@urlor\roar@repository}
       \end{tabularx}
     \end{tcolorbox}%
@@ -567,6 +593,8 @@
     \roar_json_field:no { framework } { \roar@framework }
     \roar_json_field:no { compute } { \roar@compute }
     \roar_json_field:no { operator } { \roar@operator }
+    \roar_json_field:no { steering } { \roar@steering }
+    \roar_json_field:no { humans } { \roar@humans }
     \roar_json_field:no { logs } { \roar@logs }
     \roar_json_field:no { repository } { \roar@repository }
     \roar_json_field:no { topic } { \roar@topic }
@@ -601,7 +629,7 @@
     pdfsubject={LAION ROAR 2027 submission \#\roar@id\ (\roaredition\space edition)},
     pdfkeywords={ROAR 2027, \roar@topic},
     pdfinfo={ROAR-Edition={\roaredition},ROAR-Paper={\roar@id},ROAR-Models={\roar@models},
-      ROAR-Operator={\roar@operator}}}}
+      ROAR-Operator={\roar@operator},ROAR-Steering={\roar@steering}}}}
 
 \bibliographystyle{plainnat}
 

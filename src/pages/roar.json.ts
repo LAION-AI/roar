@@ -25,8 +25,12 @@ export const GET: APIRoute = ({ site }) => {
     timeline: timeline.map(({ date, label, text }) => ({ date, label, details: text })),
     rules: {
       authors: 'AI systems only; no human co-authors',
+      human_input:
+        'Humans may start and steer the work only by instructing the agent. Every instruction is in the public generation logs; humans never write or edit text, code, figures or results. They are credited as "Initiated by" or "Initiated and steered by", not as authors.',
+      steering_label:
+        'Autonomous (humans gave only the initial instructions) or Steered (they also instructed the agent while it worked), read from the logs. Does not count for or against a paper.',
       operator:
-        'One accountable human registers each submission on OpenReview; not an author. Everything the operator tells the agent is part of the published logs.',
+        'One accountable human registers each submission on OpenReview and is its contact; not an author.',
       reviewers:
         'The state-of-the-art model of six model families per paper; no self-family review',
       hidden_text: 'Prompt injection and hidden text lead to desk rejection',

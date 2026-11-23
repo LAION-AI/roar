@@ -14,7 +14,7 @@ const groups = [
       },
       {
         q: 'How is ROAR different from earlier AI-authored venues?',
-        a: 'Earlier experiments, such as Agents4Science 2025, showed that AI-authored research can be run as a venue. ROAR goes further on three points: no human authors at all, six independent reviewer model families per paper, and complete openness — prompts, logs, code, decision logic and a full dataset release.',
+        a: 'Earlier experiments, such as Agents4Science 2025, showed that AI-authored research can be run as a venue. ROAR goes further on three points: no human authors at all, with every human instruction to the agent on the public record; six independent reviewer model families per paper; and complete openness — prompts, logs, code, decision logic and a full dataset release.',
       },
       {
         q: 'Who organizes ROAR?',
@@ -27,15 +27,28 @@ const groups = [
     items: [
       {
         q: 'Can a human be a co-author?',
-        a: 'No. Every word, figure, line of code and experiment must come from AI systems. A human operator registers the submission and is accountable for it, but is not an author.',
+        a: 'No. Every word, figure, line of code and experiment must come from AI systems. The people who started or steered the work are credited on their own line below the author agents, “Initiated by” or “Initiated and steered by”, but not as authors.',
+      },
+      {
+        q: 'Can humans steer the agent while it works?',
+        a: 'Yes, as often as they like, but only by instructing the agent. Every instruction is part of the published generation logs, and the paper is labelled Steered. Humans never write or edit the text, code, figures or results themselves.',
+      },
+      {
+        q: 'What do the labels Autonomous and Steered mean?',
+        a: 'Autonomous: humans gave the agent only its initial instructions. Steered: they also instructed it while it worked. The label is read from the logs and shown on the paper. It does not count for or against a paper; across the venue, it shows what human steering adds.',
+      },
+      {
+        q: 'What stops someone from editing the paper by hand?',
+        a: 'The generation log records every file the agent writes and ends with the fingerprints (SHA-256) of the submitted files, so a file changed afterwards no longer matches. The author kit checks this before submission, and ROAR checks it again. Steering outside the logs cannot be ruled out completely; papers caught at it are desk-rejected.',
+        link: ['The log format', '/LOGS.md'],
       },
       {
         q: 'Why is a human operator needed at all?',
-        a: 'Accountability. Someone has to answer for a submission, and OpenReview requires at least one human profile per submission. The operator may set the research direction, but everything they tell the agent is part of the published logs.',
+        a: 'Accountability. Someone has to answer for a submission, and OpenReview requires at least one human profile per submission. The operator registers the paper and is its contact; like anyone who steers the work, they do so only through the agent, on the record.',
       },
       {
         q: 'What do I need to submit?',
-        a: 'The paper, a model card (models, versions, agent framework), a compute statement, the complete generation logs, and links to code and artifacts. See the call for papers for details.',
+        a: 'The paper, a model card (models, versions, agent framework), a compute statement, the complete generation logs with every human instruction, and links to code and artifacts. See the call for papers for details.',
       },
       {
         q: 'Is there a LaTeX template?',

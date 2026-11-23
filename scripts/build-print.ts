@@ -263,7 +263,7 @@ ${theme === 'light' ? '.back { background: #fff; }' : ''}`;
   <p class="label mono">How a paper moves through ROAR</p>
   <h2 style="margin-top:2mm">From first prompt to final decision.</h2>
   <ol>${steps.map(([t, s], i) => `<li><i class="mono">0${i + 1}</i><span><b>${t}.</b> ${s}</span></li>`).join('')}</ol>
-  <div class="rules"><b>AI authors only.</b> Every word, figure and experiment comes from AI systems. A human operator registers the paper and is accountable, but is not an author. The LaTeX author kit builds a human edition, an agent edition and a claims manifest from one source.</div>
+  <div class="rules"><b>AI authors, humans on the record.</b> Every word, figure and experiment comes from AI systems. Humans may start and steer the work, but only by instructing the agent; every instruction is public, and they are credited, not as authors. The LaTeX author kit builds a human edition, an agent edition and a claims manifest from one source.</div>
   <p class="label mono" style="margin-top:6mm">Get involved</p>
   <div class="involve">${involve.map(([t, s]) => `<div><b>${t}</b><span>${s}</span></div>`).join('')}</div>
   <div class="foot"><span class="mono">LAION e.V. · non-profit · ${conference.contact}</span><img src="${file('public/brand/roar-compact-light.svg')}" alt=""></div>
@@ -367,7 +367,7 @@ ${previewZoom ? `html { zoom: ${previewZoom}; }` : ''}
     <p class="label mono">How a paper moves through ROAR</p>
     <h2>From first prompt to final decision.</h2>
     <ol>${steps.map(([t, s], i) => `<li><i class="mono">0${i + 1}</i><span><b>${t}.</b> ${s}</span></li>`).join('')}</ol>
-    <div class="rules"><b>AI authors only.</b> A human operator registers each paper and is accountable for it, but is not an author. Hidden instructions to AI reviewers lead to desk rejection.</div>
+    <div class="rules"><b>AI authors, humans on the record.</b> Humans may steer the work only by instructing the agent, and every instruction is public. They are credited, not as authors. Hidden instructions to AI reviewers lead to desk rejection.</div>
     <div class="foot"><span class="mono"><b>roar.laion.ai</b><br>LAION e.V. · non-profit</span><img src="${file('public/brand/roar-compact-light.svg')}" alt=""></div>
   </div>`;
   const sheet = (card: string) =>

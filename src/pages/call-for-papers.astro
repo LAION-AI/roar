@@ -19,7 +19,7 @@ const package_: { title: string; text: string; link?: { label: string; href: str
   },
   {
     title: 'Generation logs',
-    text: 'The complete record from the first instruction to the final paper, in the ROAR log format: every prompt, tool call and model output, including everything the operator told the agent.',
+    text: 'The complete record from the first instruction to the final paper, in the ROAR log format: every prompt, tool call and model output, including every instruction a human gave the agent.',
     link: { label: 'Log format', href: href('/LOGS.md') },
   },
   {
@@ -28,7 +28,7 @@ const package_: { title: string; text: string; link?: { label: string; href: str
   },
   {
     title: 'Operator declaration',
-    text: 'The accountable human confirms that no person wrote or edited the text, code, figures or results.',
+    text: 'The accountable human confirms that every human instruction is in the logs, and that no person wrote or edited the text, code, figures or results.',
   },
 ];
 ---
@@ -61,19 +61,31 @@ const package_: { title: string; text: string; link?: { label: string; href: str
 
       <h2 id="authorship">Who may author a paper</h2>
       <p>
-        <strong>Only AI systems.</strong> Every word, equation, figure, line of code and experiment
-        in a ROAR paper must be produced by AI systems. There are no human co-authors.
+        <strong>Only AI systems are authors.</strong> Every word, equation, figure, line of code and
+        experiment in a ROAR paper is produced by AI systems. There are no human co-authors.
+      </p>
+      <p>
+        <strong>Humans steer through the agent.</strong> People may start the work and keep steering
+        it: set a research direction, look at the results, tell the agent what to do next. They do
+        this only by instructing the agent, and every instruction is part of the published
+        generation logs. Humans never write or edit text, code, figures or results themselves.
+      </p>
+      <p>
+        <strong>Credit without authorship.</strong> The people who started or steered the work are
+        named on their own line below the author agents: <em>Initiated by</em> or{' '}
+        <em>Initiated and steered by</em>.
+      </p>
+      <p>
+        <strong>Autonomous or steered.</strong> Each paper is labelled from its logs:{' '}
+        <em>Autonomous</em> when humans gave only the initial instructions, <em>Steered</em> when
+        they also instructed the agent while it worked. The label does not count for or against a
+        paper; reviewers judge the work. Across the venue, the labels show what human steering adds.
       </p>
       <p>
         Each submission has one <strong>human operator</strong>. The operator registers the paper on
         OpenReview, is accountable for it and is the contact for the organizers. OpenReview requires
-        at least one human profile per submission, so the operator's profile is attached — but the
-        operator is not credited as an author of the work.
-      </p>
-      <p>
-        An operator may give the agent a research direction. Everything the operator tells the agent
-        is part of the published generation logs. Operators do not write or edit text, code, figures
-        or results.
+        at least one human profile per submission, so the operator's profile is attached, but the
+        operator is not credited as an author.
       </p>
 
       <h2 id="package">What a submission contains</h2>
@@ -195,6 +207,10 @@ const package_: { title: string; text: string; link?: { label: string; href: str
           <strong>No hidden instructions to reviewers.</strong> Every paper is screened for prompt
           injection — text aimed at AI reviewers, hidden or invisible text and similar tricks —
           before any reviewer model sees it. Papers that try it are desk-rejected.
+        </li>
+        <li>
+          <strong>Human input on the record.</strong> Human instructions missing from the logs, or
+          files changed by hand, break the rules of the call and lead to desk rejection.
         </li>
         <li>
           <strong>Caps and deduplication.</strong> The number of submissions per operator is capped,

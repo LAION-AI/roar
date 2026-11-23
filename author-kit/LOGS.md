@@ -1,7 +1,7 @@
 # ROAR generation log format (roar-log/0.1, preview)
 
-Every ROAR submission includes the complete record of how it was made: every instruction from the
-human operator, every model call, every tool call and every file the agent wrote, from the first
+Every ROAR submission includes the complete record of how it was made: every instruction a human
+gave the agent, every model call, every tool call and every file the agent wrote, from the first
 prompt to the final paper. Agent frameworks all log differently; this format makes the logs of
 different submissions comparable, checkable and usable as an open dataset.
 
@@ -35,7 +35,7 @@ backwards) and `type`. Most also have `actor`: the agent (or sub-agent) that act
 
 | `type` | When | Required fields |
 | --- | --- | --- |
-| `instruction` | Anything the human operator tells the agent. **All of it must be logged.** | `content` |
+| `instruction` | Anything a human tells the agent, at the start or later. **All of it must be logged.** `actor` names the human. | `content` |
 | `message` | A model call: what went in and what came out | `model`, `role` (`system`, `user`, `assistant`), `content` or `content_ref`; optional `tokens: {"input": n, "output": n}` |
 | `tool_call` | The agent calls a tool (search, shell, code, browser…) | `call_id`, `tool`, `arguments` |
 | `tool_result` | The tool answers | `call_id` (matching a `tool_call`), `ok` (true/false), `content` or `content_ref` |
@@ -54,11 +54,26 @@ backwards) and `type`. Most also have `actor`: the agent (or sub-agent) that act
 `outputs` must include the submitted LaTeX source with its SHA-256, so the log provably ends with
 the paper that was submitted. `roar_check.py` compares the hashes with the files.
 
+## Human input
+
+Humans may start and steer the work, but only by instructing the agent: they never write or edit
+files themselves. So the `instruction` records are exactly what humans contributed, and they
+decide the paper's label:
+
+- **Autonomous:** every `instruction` comes before the agent's first action (a model response,
+  tool call, file or compute record). Humans gave only the initial instructions.
+- **Steered:** at least one `instruction` comes later. Humans also steered the agent while it worked.
+
+The paper declares its label with `\roarset{steering = ...}` and names the humans in
+`\roarset{humans = ...}`; `roar_check.py` compares the label with the log. The label does not
+count for or against a paper. The last `file` record of each submitted file must match the
+footer, so a file changed by hand shows up.
+
 ## Rules
 
 1. **Complete.** No gaps in `seq`, nothing left out, nothing edited after the fact.
-2. **Operator instructions included.** Everything the human operator told the agent is an
-   `instruction` event.
+2. **Every human instruction included.** Everything a human told the agent, at the start or
+   later, is an `instruction` event with that human as `actor`.
 3. **Redact, don't delete.** Replace secrets (API keys, passwords, tokens) and personal data with
    `[REDACTED: reason]` and add `"redacted": true` to that record. Keep the record itself.
    `roar_check.py` refuses logs that contain things that look like API keys.

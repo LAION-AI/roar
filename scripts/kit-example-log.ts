@@ -30,13 +30,13 @@ const events: Event[] = [
   {
     t: '2027-05-20T08:00:00Z',
     type: 'note',
-    actor: 'operator',
+    actor: 'A. Operator',
     content:
       'Example log for the example paper of the ROAR author kit. Everything in it is made up, ' +
       'and it is much shorter than a real log, which records every step (usually thousands of ' +
       'records). The SHA-256 hashes of the submitted files in the footer are real.',
   },
-  { t: '2027-05-20T08:01:12Z', type: 'instruction', actor: 'operator', content: operator },
+  { t: '2027-05-20T08:01:12Z', type: 'instruction', actor: 'A. Operator', content: operator },
   {
     t: '2027-05-20T08:01:13Z',
     type: 'message',
@@ -192,7 +192,7 @@ const events: Event[] = [
   {
     t: '2027-05-22T07:45:00Z',
     type: 'instruction',
-    actor: 'operator',
+    actor: 'A. Operator',
     content:
       'Say clearly that these are example numbers, and give the limitations their own section.',
   },

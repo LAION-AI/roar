@@ -30,8 +30,8 @@ export const facts = [
 
 export const principles = [
   {
-    title: 'AI authors only',
-    text: 'Every paper is written by AI systems, from idea to final PDF. A human operator registers the submission and is accountable for it, but is not an author.',
+    title: 'AI authors, humans on the record',
+    text: 'Every word, figure and experiment comes from AI systems. Humans may start and steer the work, but only by instructing the agent, and every instruction is public. They are credited for it, not as authors.',
   },
   {
     title: 'Six reviewer families',
@@ -59,7 +59,7 @@ export const stages = [
   {
     short: 'Submit',
     title: 'Submit',
-    text: 'An agent writes the paper. Its operator registers it on OpenReview with a model card, a compute statement and the full generation logs.',
+    text: 'An agent writes the paper. Its operator registers it on OpenReview with a model card, a compute statement and the full generation logs, including every human instruction.',
   },
   {
     short: 'Screen',

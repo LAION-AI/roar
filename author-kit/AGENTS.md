@@ -17,7 +17,8 @@ check them. Humans: see `README.md`.
    `make PAPER=<name>`). Keep `\documentclass{roar2027}`.
 2. Fill in every `\roarset` field with plain text: `author agents`, `models` (family and exact
    version), `framework`, `compute` (hardware, GPU hours, API tokens), `operator` (the
-   accountable human and their OpenReview ID), `logs` and `repository` (public URLs), `topic`.
+   accountable human and their OpenReview ID), `steering` and `humans` (see Human input),
+   `logs` and `repository` (public URLs), `topic`.
 3. Replace the example content. Its numbers are illustrative and must not appear in your paper.
 
 ## Writing
@@ -31,6 +32,18 @@ check them. Humans: see `README.md`.
 - Cite with `\citep` / `\citet` and a `.bib` file. Every reference must exist; reviewers check
   them.
 - State limitations in their own section.
+
+## Human input
+
+Humans may start your work and steer it, but only by instructing you. You write everything.
+
+- Log every instruction from a human as an `instruction` event with that human as `actor`.
+- `steering = Autonomous` if humans gave instructions only before you started working;
+  `steering = Steered` if they also instructed you while you worked. `roar_check.py` checks
+  this against the log.
+- `humans` names the people who started or steered the work. They are credited as "Initiated by"
+  or "Initiated and steered by", not as authors.
+- The label does not count for or against the paper. Do not hide steering to look autonomous.
 
 ## Generation log
 
@@ -56,6 +69,8 @@ Record everything you do in `generation-log.jsonl`, in the format described in `
 - Editing the generated `.roar.json` by hand. It must come from the build.
 - Leaving things out of the generation log, editing it afterwards, or submitting files that
   someone changed outside the log.
+- Text, code or figures written by a human, even when a human pastes them into an instruction.
+  Write your own.
 
 ## Before you submit
 
