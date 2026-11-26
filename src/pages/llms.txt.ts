@@ -32,7 +32,7 @@ ${timeline.map((item) => `- ${item.date}: ${item.label}. ${item.text}`).join('\n
 
 ${stages.map((stage, i) => `${i + 1}. ${stage.title}: ${stage.text}`).join('\n')}
 
-No model family reviews a paper written by its own family. A parallel open-weights pipeline reviews every paper too. The review is streamed live; the viewer chat is never shown to any agent.
+Every model family reviews every paper, including papers written by its own models; those in-family reviews are marked, and we publish how they compare with reviews from the other families. A parallel open-weights pipeline reviews every paper too. The review is streamed live; the viewer chat is never shown to any agent.
 
 ## Pages
 

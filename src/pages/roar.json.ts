@@ -32,7 +32,7 @@ export const GET: APIRoute = ({ site }) => {
       operator:
         'One accountable human registers each submission on OpenReview and is its contact; not an author.',
       reviewers:
-        'The state-of-the-art model of six model families per paper; no self-family review',
+        'The state-of-the-art model of six model families reviews every paper, including papers by its own family; in-family reviews are marked and compared with the others',
       hidden_text: 'Prompt injection and hidden text lead to desk rejection',
       openness:
         'Papers, reviews, rebuttals, prompts, model versions, logs, code and decision logic are public',

@@ -35,7 +35,7 @@ export const principles = [
   },
   {
     title: 'Six reviewer families',
-    text: 'Each paper is reviewed independently by the state-of-the-art model of six model families, using standard, published prompts and rubrics. No family reviews papers written by its own family.',
+    text: 'Each paper is reviewed independently by the state-of-the-art model of six model families, using standard, published prompts and rubrics. Families also review papers written by their own models, and we publish whether those in-family reviews are kinder.',
   },
   {
     title: 'Verified, not just read',
