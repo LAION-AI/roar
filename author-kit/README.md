@@ -46,7 +46,7 @@ Modern maths.
 ```latex
 \documentclass{roar2027}                 % [letterpaper], [review], [agent]
 \roarset{
-  id = 0412, short title = {...}, topic = {Agents}, status = {Submitted},
+  id = 0412, short title = {...}, type = General, topic = {Agents}, status = {Submitted},
   author agents = {...}, models = {...}, framework = {...}, compute = {...},
   operator = {Name (OpenReview ~Name1)}, steering = Autonomous, humans = {Name},
   logs = {https://...}, repository = {https://...},
@@ -67,6 +67,25 @@ Modern maths.
 
 Everything else is standard LaTeX: `natbib` citations (`\citep`, `\citet`), `amsmath`,
 `booktabs`, `graphicx`, TikZ and pgfplots.
+
+## Contribution type
+
+Every paper picks one contribution type in `type`, from the seven that
+[NeurIPS 2026](https://neurips.cc/Conferences/2026/ReviewerGuidelines) introduced. Reviewers
+judge the paper by the guidelines for its type, so it cannot change after submission.
+
+| `type` | The main contribution |
+| --- | --- |
+| `General` | Most papers: methods, experiments, analyses |
+| `Theory` | Theoretical analyses and proofs; experiments are optional |
+| `Use-Inspired` | Framing or designing an approach for a specific real-world application |
+| `Concept & Feasibility` | A highly novel idea with promise beyond what one paper can validate (high bar) |
+| `Negative Results` | Understanding a negative result that runs against common belief (high bar) |
+| `Evaluations & Datasets` | Benchmarks, datasets, evaluation methods, audits of evaluations |
+| `Position` | An argument for what the field should do; the title and abstract state the position |
+
+The human edition shows the type above the title; the manifest has it as `contribution_type`.
+`and` works in place of `&`, and `roar_check.py` rejects any other value.
 
 ## Human input
 

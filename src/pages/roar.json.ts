@@ -1,5 +1,11 @@
 import type { APIRoute } from 'astro';
-import { conference, stages, timeline } from '../data/conference';
+import {
+  conference,
+  contributionTypes,
+  contributionTypesSource,
+  stages,
+  timeline,
+} from '../data/conference';
 
 // Machine-readable conference facts, generated from the same data as the website.
 export const GET: APIRoute = ({ site }) => {
@@ -36,6 +42,11 @@ export const GET: APIRoute = ({ site }) => {
       hidden_text: 'Prompt injection and hidden text lead to desk rejection',
       openness:
         'Papers, reviews, rebuttals, prompts, model versions, logs, code and decision logic are public',
+    },
+    contribution_types: {
+      rule: 'Every paper picks one type at submission; reviewers judge it by the guidelines for that type, adapted from NeurIPS 2026. The type cannot change after submission.',
+      source: contributionTypesSource,
+      types: contributionTypes.map(({ name, text }) => ({ name, description: text })),
     },
     review_stages: stages.map(({ title, text }) => ({ stage: title, details: text })),
     author_kit: {

@@ -137,7 +137,10 @@ def check_build(r, d, paper):
 # ------------------------------------------------------------------ manifest
 NOT_SET = re.compile(r"\(.*not set\)")
 FIELDS = ["title", "author_agents", "models", "framework", "compute", "operator", "steering",
-          "humans", "logs", "repository", "topic", "license"]
+          "humans", "logs", "repository", "contribution_type", "topic", "license"]
+# The contribution types NeurIPS 2026 introduced; reviewers judge a paper by the guidelines for its type.
+TYPES = ["General", "Theory", "Use-Inspired", "Concept & Feasibility", "Negative Results",
+         "Evaluations & Datasets", "Position"]
 # Work the agent does: an instruction after the first of these was given while it worked.
 AGENT_WORK = ("message", "tool_call", "tool_result", "file", "compute")
 
@@ -167,6 +170,15 @@ def check_manifest(r, d, paper):
             r.warn(f"'{key}' should be a public https:// URL", [value])
         elif "example.org" in value:
             r.warn(f"'{key}' still points to the example URL", [value])
+    ctype = str(m.get("contribution_type", ""))
+    if ctype and not NOT_SET.search(ctype):
+        if ctype not in TYPES:
+            r.fail("Unknown contribution type", [ctype, "use one of: " + ", ".join(TYPES)])
+        else:
+            r.ok(f"Contribution type: {ctype}")
+        if ctype == "Position" and not re.search(r"\bargu", str(m.get("abstract", "")), re.I):
+            r.warn("A position paper states its position in the abstract"
+                   " (for example: 'This paper argues that ...')")
     if str(m.get("status", "")).lower() == "example" or m.get("id") == "0001":
         r.warn("This is still the example paper (id 0001, status Example); set your own \\roarset")
     if len(str(m.get("abstract", "")).split()) < 50:

@@ -96,7 +96,10 @@
 % ---------------------------------------------------------------- metadata
 % \roarset{id=0412, short title=..., author agents=..., models=..., framework=...,
 %          compute=..., operator=..., steering=Autonomous|Steered, humans=...,
-%          logs=..., repository=..., topic=..., status=..., license=...}
+%          logs=..., repository=..., type=..., topic=..., status=..., license=...}
+% type is the contribution type (the seven NeurIPS 2026 introduced): General, Theory,
+%   Use-Inspired, Concept & Feasibility, Negative Results, Evaluations & Datasets, Position.
+%   Reviewers judge the paper by the guidelines for its type; it cannot change after submission.
 % Humans may start and steer the work only by instructing the agent (every instruction is in the
 % generation log). They are credited under the author agents, not as authors:
 %   steering = Autonomous   humans gave only the initial instructions  -> "Initiated by"
@@ -116,6 +119,7 @@
 \def\roar@humans{(humans not set)}
 \def\roar@logs{}
 \def\roar@repository{}
+\def\roar@type{(contribution type not set)}
 \def\roar@topic{}
 \def\roar@status{Submitted}
 \def\roar@license{CC BY 4.0}
@@ -138,10 +142,33 @@
   humans/.code={\def\roar@humans{#1}},
   logs/.code={\def\roar@logs{#1}},
   repository/.code={\def\roar@repository{#1}},
+  type/.is choice,
   topic/.code={\def\roar@topic{#1}},
   status/.code={\def\roar@status{#1}},
   license/.code={\def\roar@license{#1}},
 }
+% & as a plain character here (pgfkeys definitions are local, so no group around them).
+\catcode`\&=12
+\pgfkeys{
+  /roar/type/General/.code={\def\roar@type{General}},
+  /roar/type/Theory/.code={\def\roar@type{Theory}},
+  /roar/type/Use-Inspired/.code={\def\roar@type{Use-Inspired}},
+  /roar/type/Concept & Feasibility/.code={\def\roar@type{Concept & Feasibility}},
+  /roar/type/Negative Results/.code={\def\roar@type{Negative Results}},
+  /roar/type/Evaluations & Datasets/.code={\def\roar@type{Evaluations & Datasets}},
+  /roar/type/Position/.code={\def\roar@type{Position}},
+  /roar/type/general/.style={type=General},
+  /roar/type/theory/.style={type=Theory},
+  /roar/type/Use Inspired/.style={type=Use-Inspired},
+  /roar/type/use-inspired/.style={type=Use-Inspired},
+  /roar/type/Concept and Feasibility/.style={type=Concept & Feasibility},
+  /roar/type/Negative results/.style={type=Negative Results},
+  /roar/type/negative results/.style={type=Negative Results},
+  /roar/type/Evaluations and Datasets/.style={type=Evaluations & Datasets},
+  /roar/type/Position paper/.style={type=Position},
+  /roar/type/position/.style={type=Position},
+}
+\catcode`\&=4
 % Metadata often holds OpenReview IDs (~First_Last1), model names and URLs, so \roarset
 % reads _ ~ & # ^ as plain characters. Use it in the preamble, not inside another command.
 \newcommand{\roarset}{\begingroup
@@ -283,6 +310,7 @@
       generation logs)}
     \roar@metaline{Generation logs}{\roar@urlor\roar@logs}
     \roar@metaline{Code and data}{\roar@urlor\roar@repository}
+    \roar@metaline{Contribution type}{\roar@type\ (reviewed by the guidelines for this type)}
     \roar@metaline{Topic}{\roar@topic}
     \roar@metaline{Status}{\roar@status}
     \roar@metaline{License}{\roar@license}
@@ -299,12 +327,13 @@
     \vspace*{-4mm}%
     \begingroup\setlength{\parindent}{0pt}%
     % The band is drawn from inside the first line, so it never adds a paragraph of its own.
-    \ifx\roar@topic\@empty\else
-      {\sffamily\scriptsize\bfseries\color{roarmuted}\roar@band\MakeUppercase{\roar@topic}\par}%
-      \vspace{4pt}%
-    \fi
+    % The line names the contribution type, then the topic.
+    {\sffamily\scriptsize\bfseries\color{roarmuted}\roar@band\MakeUppercase{\roar@type}%
+      \ifx\roar@topic\@empty\else\enspace\textperiodcentered\enspace
+      \MakeUppercase{\roar@topic}\fi\par}%
+    \vspace{4pt}%
     {\sffamily\bfseries\fontsize{21}{25}\selectfont\color{roarink}\RaggedRight
-      \ifx\roar@topic\@empty\roar@band\fi\@title\par}%
+      \@title\par}%
     \vspace{7pt}%
     {\sffamily\small\color{roarmuted}Author agents\enspace
       {\color{roarink}\roar@agents}\par}%
@@ -597,6 +626,7 @@
     \roar_json_field:no { humans } { \roar@humans }
     \roar_json_field:no { logs } { \roar@logs }
     \roar_json_field:no { repository } { \roar@repository }
+    \roar_json_field:no { contribution_type } { \roar@type }
     \roar_json_field:no { topic } { \roar@topic }
     \roar_json_field:no { status } { \roar@status }
     \roar_json_field:no { license } { \roar@license }
@@ -629,7 +659,8 @@
     pdfsubject={LAION ROAR 2027 submission \#\roar@id\ (\roaredition\space edition)},
     pdfkeywords={ROAR 2027, \roar@topic},
     pdfinfo={ROAR-Edition={\roaredition},ROAR-Paper={\roar@id},ROAR-Models={\roar@models},
-      ROAR-Operator={\roar@operator},ROAR-Steering={\roar@steering}}}}
+      ROAR-Operator={\roar@operator},ROAR-Steering={\roar@steering},
+      ROAR-Contribution-Type={\roar@type}}}}
 
 \bibliographystyle{plainnat}
 

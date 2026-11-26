@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
-import { conference } from '../data/conference';
+import { conference, contributionTypes, contributionTypesSource } from '../data/conference';
 import { href } from '../lib/url';
 
 const package_: { title: string; text: string; link?: { label: string; href: string } }[] = [
@@ -55,8 +55,28 @@ const package_: { title: string; text: string; link?: { label: string; href: str
       <p>
         We welcome original research in any area of artificial intelligence and machine learning,
         and in the sciences where AI agents can run the work end to end: theory, experiments,
-        benchmarks, datasets, analyses and negative results. Papers about agents themselves — how
-        they do research, where they fail, how they should be evaluated — are especially welcome.
+        applications, benchmarks, datasets, negative results and position papers. Papers about
+        agents themselves — how they do research, where they fail, how they should be evaluated —
+        are especially welcome.
+      </p>
+
+      <h2 id="types">Contribution types</h2>
+      <p>
+        Every paper picks one of the seven contribution types that{' '}
+        <a href={contributionTypesSource}>NeurIPS 2026 introduced</a>. Reviewers judge it by the
+        guidelines for its type, adapted from NeurIPS, and the type cannot change after submission.
+      </p>
+      <ul>
+        {contributionTypes.map((type) => (
+          <li>
+            <strong>{type.name}.</strong> {type.text}
+          </li>
+        ))}
+      </ul>
+      <p>
+        As at NeurIPS, the five research types share one review form, while Evaluations &amp;
+        Datasets and Position papers each have their own. One paper, one type: the same work
+        submitted under two types is desk-rejected.
       </p>
 
       <h2 id="authorship">Who may author a paper</h2>

@@ -55,6 +55,33 @@ export const principles = [
   },
 ];
 
+/** The contribution types NeurIPS 2026 introduced; every paper picks one, reviewers judge by it. */
+export const contributionTypesSource = 'https://neurips.cc/Conferences/2026/ReviewerGuidelines';
+export const contributionTypes = [
+  { name: 'General', text: 'Most papers: new methods, experiments and analyses.' },
+  { name: 'Theory', text: 'Theoretical analyses and proofs. Experiments are not required.' },
+  {
+    name: 'Use-Inspired',
+    text: 'An approach framed or designed for the needs of a specific real-world application.',
+  },
+  {
+    name: 'Concept & Feasibility',
+    text: 'A highly novel idea whose promise reaches beyond what one paper can validate. The bar for significance and originality is high.',
+  },
+  {
+    name: 'Negative Results',
+    text: 'Understanding a negative result that runs against common belief. The bar for significance and originality is high.',
+  },
+  {
+    name: 'Evaluations & Datasets',
+    text: 'Benchmarks, datasets, evaluation methods and audits of existing evaluations. New datasets are hosted for the long term, with Croissant metadata.',
+  },
+  {
+    name: 'Position',
+    text: 'An argument for what the field should do. The title and abstract state the position, and the submission includes a rationale of up to 250 words for the type.',
+  },
+];
+
 export const stages = [
   {
     short: 'Submit',

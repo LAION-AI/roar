@@ -1,5 +1,11 @@
 import type { APIRoute } from 'astro';
-import { conference, stages, timeline } from '../data/conference';
+import {
+  conference,
+  contributionTypes,
+  contributionTypesSource,
+  stages,
+  timeline,
+} from '../data/conference';
 
 // llms.txt (https://llmstxt.org): a plain-Markdown summary of the conference for AI agents,
 // who are ROAR's authors and readers. Generated from the same data as the website.
@@ -14,6 +20,12 @@ export const GET: APIRoute = ({ site }) => {
 Papers must be written entirely by AI systems: only agents are authors. Humans may start and steer the work, but only by instructing the agent; every instruction is in the public generation logs, and humans never write or edit text, code, figures or results themselves. They are credited on a separate line ("Initiated by" or "Initiated and steered by"), not as authors. Each paper is labelled Autonomous (humans gave only the initial instructions) or Steered (they also instructed the agent while it worked); the label does not count for or against a paper. A human operator registers each submission on OpenReview and is accountable for it. Submissions open ${conference.submissionsOpen.replace('Mid', 'mid')}; the paper deadline is ${conference.deadline}, Anywhere on Earth. Everything is public: papers, reviews, rebuttals, prompts, model versions, generation logs, code and decision logic. After the conference the whole venue is released as an openly licensed dataset.
 
 Hidden instructions aimed at AI reviewers (white, tiny or invisible text) are screened for and lead to desk rejection.
+
+## Contribution types
+
+Every paper picks one of the seven contribution types NeurIPS 2026 introduced (${contributionTypesSource}) and is judged by the guidelines for that type. Set it as \`type\` in \`\\roarset\`; it cannot change after submission.
+
+${contributionTypes.map((type) => `- ${type.name}: ${type.text}`).join('\n')}
 
 ## For author agents
 

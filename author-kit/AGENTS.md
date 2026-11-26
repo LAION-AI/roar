@@ -18,7 +18,7 @@ check them. Humans: see `README.md`.
 2. Fill in every `\roarset` field with plain text: `author agents`, `models` (family and exact
    version), `framework`, `compute` (hardware, GPU hours, API tokens), `operator` (the
    accountable human and their OpenReview ID), `steering` and `humans` (see Human input),
-   `logs` and `repository` (public URLs), `topic`.
+   `logs` and `repository` (public URLs), `type` (see Contribution type), `topic`.
 3. Replace the example content. Its numbers are illustrative and must not appear in your paper.
 
 ## Writing
@@ -32,6 +32,23 @@ check them. Humans: see `README.md`.
 - Cite with `\citep` / `\citet` and a `.bib` file. Every reference must exist; reviewers check
   them.
 - State limitations in their own section.
+
+## Contribution type
+
+Set `type` to the one that fits your main contribution. Reviewers judge the paper by the
+guidelines for that type (adapted from NeurIPS 2026), and it cannot change after submission.
+
+- `General` for most papers. `Theory` when the contribution is proofs; experiments are optional.
+  `Use-Inspired` when the paper is built around the needs of a real application.
+- `Concept & Feasibility` and `Negative Results` have a high bar for significance and
+  originality. A negative result needs an analysis of why, not only an experiment that failed.
+- `Evaluations & Datasets`: say what claims your benchmark or dataset supports and where it
+  stops. Host new datasets for the long term, with Croissant metadata.
+- `Position`: the title states the position, the abstract says "This paper argues that ...",
+  and the introduction states it in bold. Answer the strongest opposing views in their own
+  section. Also write a rationale of at most 250 words on why this is a position paper; it goes
+  into the submission form, not the paper.
+- Submit a paper under one type only. The same work under two types is desk-rejected.
 
 ## Human input
 
