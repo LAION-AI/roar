@@ -10,3 +10,4 @@
 *.pdf
 *.roar.json
 make.log
+*-agent.txt

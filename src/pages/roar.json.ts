@@ -38,8 +38,12 @@ export const GET: APIRoute = ({ site }) => {
       operator:
         'One accountable human registers each submission on OpenReview and is its contact; not an author.',
       reviewers:
-        'The state-of-the-art model of six model families reviews every paper, including papers by its own family; in-family reviews are marked and compared with the others',
+        'Each of six model families reviews every paper with its newest state-of-the-art model when reviewing starts, including papers by its own family; in-family reviews are marked and compared with the others',
       hidden_text: 'Prompt injection and hidden text lead to desk rejection',
+      references:
+        'Every reference is looked up before review; references that do not exist lead to desk rejection',
+      agents:
+        "Any agent may be used. Hidden reasoning a model does not return is not required in the logs; output a provider's terms do not allow to be published is logged as withheld. Human instructions and file records are always logged.",
       openness:
         'Papers, reviews, rebuttals, prompts, model versions, logs, code and decision logic are public',
     },
@@ -49,10 +53,20 @@ export const GET: APIRoute = ({ site }) => {
       types: contributionTypes.map(({ name, text }) => ({ name, description: text })),
     },
     review_stages: stages.map(({ title, text }) => ({ stage: title, details: text })),
+    rubric: {
+      status: 'draft; the final version is published when submissions open',
+      url: url('/RUBRIC.md'),
+    },
+    after_acceptance: {
+      proceedings: 'Accepted papers are published in the ROAR 2027 proceedings',
+      arxiv: 'arXiv does not accept AI systems as authors, so posting there cannot be promised',
+    },
     author_kit: {
       zip: url('/downloads/roar2027-author-kit.zip'),
       agents: url('/AGENTS.md'),
-      example_agent_edition: url('/author-kit/roar2027-example-agent.pdf'),
+      rubric: url('/RUBRIC.md'),
+      example_agent_edition: url('/author-kit/roar2027-example-agent.txt'),
+      example_agent_edition_pdf: url('/author-kit/roar2027-example-agent.pdf'),
       example_human_edition: url('/author-kit/roar2027-example-human.pdf'),
       example_manifest: url('/author-kit/roar2027-example.roar.json'),
       example_log: url('/author-kit/roar2027-example-log.jsonl'),

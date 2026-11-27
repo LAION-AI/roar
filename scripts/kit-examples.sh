@@ -7,6 +7,11 @@ make -C author-kit
 mkdir -p public/author-kit
 cp author-kit/paper-human.pdf public/author-kit/roar2027-example-human.pdf
 cp author-kit/paper-agent.pdf public/author-kit/roar2027-example-agent.pdf
+if [ -f author-kit/paper-agent.txt ]; then
+  cp author-kit/paper-agent.txt public/author-kit/roar2027-example-agent.txt
+else
+  echo "No paper-agent.txt (needs pdftotext): skipping the agent edition's text file" >&2
+fi
 cp author-kit/paper-agent.roar.json public/author-kit/roar2027-example.roar.json
 cp author-kit/generation-log.jsonl public/author-kit/roar2027-example-log.jsonl
 for edition in human agent; do

@@ -95,6 +95,15 @@ def check_build(r, d, paper):
         r.ok("Human and agent editions are built")
         if tex.exists() and any(p.stat().st_mtime < tex.stat().st_mtime for p in pdfs):
             r.warn(f"{tex.name} changed after the last build; run make again")
+    # The agent edition is plain text; its PDF is the same text, rendered.
+    txt = d / f"{paper}-agent.txt"
+    if not txt.exists():
+        r.warn(f"{txt.name} is missing: the agent edition as plain text (install pdftotext from"
+               " poppler, then run make agent)")
+    elif pdfs[1].exists() and txt.stat().st_mtime < pdfs[1].stat().st_mtime:
+        r.warn(f"{txt.name} is older than {pdfs[1].name}; run make agent again")
+    else:
+        r.ok(f"Agent edition as plain text: {txt.name}")
 
     human_m, agent_m = d / f"{paper}-human.roar.json", d / f"{paper}-agent.roar.json"
     if human_m.exists() and agent_m.exists():
@@ -396,6 +405,24 @@ def lookup(fields):
     return None
 
 
+def search_title(title):
+    """The closest title on Crossref or arXiv for a reference that has no identifier, or None."""
+    headers = {"User-Agent": f"roar-check/{VERSION} (LAION ROAR author kit)"}
+    q = urllib.parse.quote(title)
+    req = urllib.request.Request(f"https://api.crossref.org/works?rows=3&query.bibliographic={q}",
+                                 headers=headers)
+    data = json.loads(urllib.request.urlopen(req, timeout=20).read())
+    found = [(t or [""])[0] for t in (i.get("title") for i in data.get("message", {}).get("items", []))]
+    phrase = urllib.parse.quote(f'ti:"{re.sub(r"[^A-Za-z0-9 ]", " ", title)}"')
+    req = urllib.request.Request(f"https://export.arxiv.org/api/query?max_results=3&search_query={phrase}",
+                                 headers=headers)
+    xml = urllib.request.urlopen(req, timeout=20).read().decode("utf-8", "replace")
+    found += [re.sub(r"\s+", " ", t).strip() for t in re.findall(r"<entry>.*?<title>(.*?)</title>", xml, re.S)]
+    a = words(title)
+    best = max(found, key=lambda t: len(a & words(t)) / max(1, len(a | words(t))), default=None)
+    return best if best and len(a & words(best)) / max(1, len(a | words(best))) >= 0.8 else None
+
+
 def check_references(r, d, online):
     r.start("References")
     bibs = sorted(d.glob("*.bib"))
@@ -410,9 +437,17 @@ def check_references(r, d, online):
         r.ok(f"All {len(entries)} references have a DOI, arXiv ID or URL")
     if not online:
         return
-    bad, mismatch, checked = [], [], 0
+    bad, mismatch, unfound, checked = [], [], [], 0
     for key, f in entries:
         if not (arxiv_id(f) or f.get("doi")):
+            # No identifier: look the title up instead. Books, software and web pages are often
+            # not indexed, so a miss is a warning, not an error.
+            if f.get("title"):
+                try:
+                    if not search_title(re.sub(r"[{}\\]", "", f["title"])):
+                        unfound.append(key)
+                except Exception as e:  # a network problem is not the paper's fault
+                    r.warn(f"Could not look up {key}", [str(e)[:100]])
             continue
         try:
             found = lookup(f)
@@ -427,9 +462,12 @@ def check_references(r, d, online):
             if a and len(a & b) / max(1, len(a | b)) < 0.6:
                 mismatch.append(f"{key}: the identifier points to \u201c{found[:80]}\u201d")
     if bad:
-        r.fail("References whose arXiv ID or DOI does not exist", bad)
+        r.fail("References whose arXiv ID or DOI does not exist (this leads to desk rejection)", bad)
     if mismatch:
         r.warn("References whose title differs from the record their identifier points to", mismatch)
+    if unfound:
+        r.warn("References without a DOI or arXiv ID that Crossref and arXiv do not know by title;"
+               " make sure they exist (references that do not exist lead to desk rejection)", unfound)
     if checked and not bad and not mismatch:
         r.ok(f"{checked} references found on arXiv or Crossref, with matching titles")
 
@@ -530,7 +568,7 @@ def check_log(r, d, paper, log_arg, manifest):
     events = records[1:-1] if footer else records[1:]
     calls, results, counts = set(), set(), {}
     tokens = {"input": 0, "output": 0}
-    gpu_hours, redacted = 0.0, 0
+    gpu_hours, redacted, withheld = 0.0, 0, {}
     written, refs_missing = {}, []
     working, initial, during, human_words = False, 0, 0, 0
     for i, ev in enumerate(events, 1):
@@ -558,8 +596,15 @@ def check_log(r, d, paper, log_arg, manifest):
         for field in EVENT_FIELDS[kind]:
             if field not in ev:
                 errors.append(f"{where}: '{field}' missing")
-        if kind in ("message", "tool_result") and "content" not in ev and "content_ref" not in ev:
-            errors.append(f"{where}: needs 'content' or 'content_ref'")
+        if kind in ("message", "tool_result") and not any(k in ev for k in ("content", "content_ref", "withheld")):
+            errors.append(f"{where}: needs 'content', 'content_ref' or 'withheld'")
+        if "withheld" in ev:
+            if kind not in ("message", "tool_result"):
+                errors.append(f"{where}: only model messages and tool results can be withheld")
+            elif not str(ev.get("withheld")).strip():
+                errors.append(f"{where}: 'withheld' must say why the content is left out")
+            else:
+                withheld[str(ev["withheld"]).strip()] = withheld.get(str(ev["withheld"]).strip(), 0) + 1
         if ev.get("redacted"):
             redacted += 1
         ref = ev.get("content_ref")
@@ -618,6 +663,9 @@ def check_log(r, d, paper, log_arg, manifest):
         r.fail("Files the log refers to (content_ref) are missing; submit them with the log", refs_missing)
     if redacted:
         r.ok(f"{redacted} record(s) redacted, not deleted")
+    if withheld:
+        r.ok(f"{sum(withheld.values())} record(s) with content withheld (allowed, see LOGS.md)",
+             [f"{n}x {why}" for why, n in sorted(withheld.items())])
 
     totals = footer.get("totals") or {}
     off = []

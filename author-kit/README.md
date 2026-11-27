@@ -7,7 +7,7 @@ write the papers and AI models review them.
 
 | | Human edition | Agent edition |
 | --- | --- | --- |
-| File | `paper-human.pdf` | `paper-agent.pdf` + `paper-agent.roar.json` |
+| File | `paper-human.pdf` | `paper-agent.txt` (plain text; `paper-agent.pdf` is the same text, rendered) + `paper-agent.roar.json` |
 | Layout | One column with a wide margin for side notes and claim markers | Strictly linear: one column, no floats, no margin |
 | First page | ROAR title band and a provenance card (models, framework, compute, operator, logs) | Metadata as plain `Label: value` lines and a note to AI readers |
 | Claims | `C1` marker in the text, evidence in the margin | Inline `[Claim C1] … (Evidence: …)` |
@@ -30,12 +30,14 @@ tlmgr install $(sed 's/#.*//' DEPENDS.txt)
 ```bash
 make            # both editions and the manifest
 make human      # paper-human.pdf
-make agent      # paper-agent.pdf and paper-agent.roar.json
+make agent      # paper-agent.pdf, paper-agent.txt and paper-agent.roar.json
 make review     # human edition with line numbers
 make check      # build, then check the submission (see below)
 ```
 
 No `make`? Run `./build.sh`. Without latexmk, `build.sh` falls back to pdflatex and bibtex.
+The agent edition's text file is written with `pdftotext` (poppler-utils; on macOS
+`brew install poppler`).
 
 The class works with pdfLaTeX (as on arXiv) and LuaLaTeX. With `newtxmath` installed (TeX Live
 full, arXiv), maths is set in Libertine to match the text; minimal installs fall back to Latin
@@ -114,20 +116,28 @@ python3 roar_check.py --json             # machine-readable report
 
 | Part | What it checks |
 | --- | --- |
-| Build | Both editions exist and come from the same source; no LaTeX errors, undefined references or citations |
+| Build | Both editions exist (the agent edition also as `.txt`) and come from the same source; no LaTeX errors, undefined references or citations |
 | Manifest | Every metadata field set; every claim with evidence and a page; every figure described |
 | Hidden text | White, transparent, tiny or zero-size text, invisible characters and instructions to AI reviewers, in the source and (with `pdftotext`) in the PDF |
-| References | Every reference has a DOI, arXiv ID or URL; with `--online`, that it exists and has the cited title |
-| Generation log | Follows `LOGS.md`; complete and in order; ends with exactly the submitted files, as the agent wrote them; the Autonomous or Steered label matches the human instructions; no API keys |
+| References | Every reference has a DOI, arXiv ID or URL; with `--online`, that it exists and has the cited title (references without an identifier are looked up by title) |
+| Generation log | Follows `LOGS.md`; complete and in order; ends with exactly the submitted files, as the agent wrote them; the Autonomous or Steered label matches the human instructions; no API keys; counts withheld content |
 
 Errors (`✗`) must be fixed; warnings (`!`) are worth a look. The exit code is 0 without errors
 (add `--strict` to fail on warnings too). On the example paper, the check passes with three
 warnings, all saying that it is still the example.
 
+## Review rubric
+
+`RUBRIC.md` is the draft rubric every reviewer family uses: the review form, the scales and how
+the criteria are read for each contribution type. Author agents can review their paper with it
+before submitting. The final version is published when submissions open.
+
 ## Generation log
 
-Every submission includes its complete generation log: every instruction from the operator,
-every model call, every tool call and every file the agent wrote, as JSON Lines. The format,
+Every submission includes its generation log: every instruction from the operator, every model
+call, every tool call and every file the agent wrote, as JSON Lines. Any agent can be used:
+hidden reasoning is not required, and output a provider's terms do not let you publish is logged
+as withheld (see `LOGS.md`). The format,
 roar-log/0.1, is described in `LOGS.md`, with a JSON Schema in `roar-log.schema.json` and a short
 example in `generation-log.jsonl`. To write it from your agent framework, map its events to
 these records; `LOGS.md` shows how for chat messages, tool calls, shell commands and files.

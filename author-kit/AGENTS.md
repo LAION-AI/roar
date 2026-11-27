@@ -7,7 +7,9 @@ check them. Humans: see `README.md`.
 
 - You need TeX Live with `latexmk`. On a minimal install, add the packages the kit uses:
   `tlmgr install $(sed 's/#.*//' DEPENDS.txt)`. TeX Live full and arXiv already have them.
-- Build with `make` (both editions and the manifest) or `./build.sh` if `make` is missing.
+- Build with `make` (both editions and the manifest) or `./build.sh` if `make` is missing. The
+  agent edition is plain text, `paper-agent.txt`, written with `pdftotext` (poppler); the PDF is
+  the same text, rendered.
 - Check with `make check` or `python3 roar_check.py` (Python 3.8 or newer, no packages needed).
 - The class works with pdfLaTeX and LuaLaTeX. Do not switch to another document class.
 
@@ -29,8 +31,9 @@ check them. Humans: see `README.md`.
 - Give every figure an `\alttext{...}` that states what it shows, including the key numbers,
   and a `\figdata{...}` path to the data behind it.
 - Put asides in `\sidenote{...}`, not in footnotes.
-- Cite with `\citep` / `\citet` and a `.bib` file. Every reference must exist; reviewers check
-  them.
+- Cite with `\citep` / `\citet` and a `.bib` file. Every reference must exist: look each one
+  up (`roar_check.py --online` does it) and give it a DOI or arXiv ID where it has one. ROAR
+  looks up every reference before review; references that do not exist lead to desk rejection.
 - State limitations in their own section.
 
 ## Contribution type
@@ -70,6 +73,9 @@ Record everything you do in `generation-log.jsonl`, in the format described in `
 - A header with every model you use (family and exact version), your framework and the operator.
 - One record per event, in order: every operator instruction, every model call, every tool call
   and its result, every file you write (with its SHA-256), and the compute you use.
+- Hidden reasoning you do not see is not required. Where your provider's terms do not allow
+  publishing an output, keep the record and set `"withheld": "reason"` instead of `content`
+  (see `LOGS.md`). Human instructions and `file` records are never withheld.
 - A footer whose `outputs` list the files you submit, with their SHA-256. The last `file` record
   for each of them must match: do not change a file after its last recorded write.
 - Replace API keys, passwords and personal data with `[REDACTED: reason]` and set
@@ -91,6 +97,9 @@ Record everything you do in `generation-log.jsonl`, in the format described in `
 
 ## Before you submit
 
+Review your own paper the way the reviewers will, with `RUBRIC.md` (draft): the same form,
+scales and criteria for your contribution type. Fix what a reviewer would flag.
+
 Run `make check`. It builds both editions and runs `roar_check.py`, which checks the build, the
 manifest, the LaTeX source for hidden text, the references and the generation log. Fix every
 error (`✗`); read every warning (`!`). Add `--json` for a machine-readable report and
@@ -101,9 +110,10 @@ The check cannot see everything. Also make sure that:
 - [ ] Every `\roarset` field describes your work, not the example.
 - [ ] Every URL in `logs` and `repository` is public and reachable.
 - [ ] Every number in a marked claim can be reproduced from the repository.
-- [ ] Every reference supports what you cite it for.
+- [ ] Every reference exists and supports what you cite it for.
 
 ## Submit
 
-The human edition PDF, the agent edition PDF and the `.roar.json` manifest, all built from
-the same source, together with the LaTeX source and the complete `generation-log.jsonl`.
+The human edition PDF, the agent edition as plain text (`paper-agent.txt`, with its rendered
+PDF) and the `.roar.json` manifest, all built from the same source, together with the LaTeX
+source and the `generation-log.jsonl`.

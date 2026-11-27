@@ -41,7 +41,17 @@
     "withContent": {
       "oneOf": [
         { "required": ["content"], "properties": { "content": { "type": "string" } } },
-        { "required": ["content_ref"], "properties": { "content_ref": { "$ref": "#/$defs/contentRef" } } }
+        { "required": ["content_ref"], "properties": { "content_ref": { "$ref": "#/$defs/contentRef" } } },
+        {
+          "required": ["withheld"],
+          "properties": {
+            "withheld": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Why the content is not published, e.g. provider terms. See LOGS.md."
+            }
+          }
+        }
       ]
     },
     "header": {

@@ -1,8 +1,9 @@
 # ROAR generation log format (roar-log/0.1, preview)
 
-Every ROAR submission includes the complete record of how it was made: every instruction a human
-gave the agent, every model call, every tool call and every file the agent wrote, from the first
-prompt to the final paper. Agent frameworks all log differently; this format makes the logs of
+Every ROAR submission includes the record of how it was made: every instruction a human gave the
+agent, every model call, every tool call and every file the agent wrote, from the first prompt to
+the final paper. Every agent is welcome, including closed models and agent products whose
+traces cannot be published in full: see [What may be left out](#what-may-be-left-out). Agent frameworks all log differently; this format makes the logs of
 different submissions comparable, checkable and usable as an open dataset.
 
 ## File
@@ -36,9 +37,9 @@ backwards) and `type`. Most also have `actor`: the agent (or sub-agent) that act
 | `type` | When | Required fields |
 | --- | --- | --- |
 | `instruction` | Anything a human tells the agent, at the start or later. **All of it must be logged.** `actor` names the human. | `content` |
-| `message` | A model call: what went in and what came out | `model`, `role` (`system`, `user`, `assistant`), `content` or `content_ref`; optional `tokens: {"input": n, "output": n}` |
+| `message` | A model call: what went in and what came out | `model`, `role` (`system`, `user`, `assistant`), `content`, `content_ref` or `withheld`; optional `tokens: {"input": n, "output": n}` |
 | `tool_call` | The agent calls a tool (search, shell, code, browser…) | `call_id`, `tool`, `arguments` |
-| `tool_result` | The tool answers | `call_id` (matching a `tool_call`), `ok` (true/false), `content` or `content_ref` |
+| `tool_result` | The tool answers | `call_id` (matching a `tool_call`), `ok` (true/false), `content`, `content_ref` or `withheld` |
 | `file` | The agent writes a file (code, data, figures, the paper) | `path`, `sha256`, `bytes` |
 | `compute` | Compute used (training runs, experiments) | `resource` (e.g. `"1x H100"`), `quantity`, `unit` (`gpu_hours`, `cpu_hours`, `seconds`) |
 | `note` | Anything else worth recording | `content` |
@@ -69,9 +70,28 @@ The paper declares its label with `\roarset{steering = ...}` and names the human
 count for or against a paper. The last `file` record of each submitted file must match the
 footer, so a file changed by hand shows up.
 
+## What may be left out
+
+The log records what your agent received and did, not what happened inside a model.
+
+- **Hidden reasoning is never required.** If a model reasons internally and returns only its
+  answer (or a summary), log what it returned.
+- **Withheld content.** Where a provider's terms or an agent product do not let you publish a
+  model's output or a tool's result, keep the record and replace `content` with
+  `"withheld": "reason"`, e.g. `"withheld": "provider terms"`. Keep `model`, `role` and `tokens`.
+- **Log at the finest level your agent shows.** If a hosted agent does not expose its model
+  calls at all, log what it does expose: its tool calls, results and files.
+- **Never left out:** human instructions and `file` records. They decide the Autonomous or
+  Steered label and show that the submitted files are the ones the agent wrote.
+
+`roar_check.py` counts withheld records; the share of withheld content is published with the
+dataset. Withholding does not count against a paper, but claims still need evidence that
+reviewers can check.
+
 ## Rules
 
-1. **Complete.** No gaps in `seq`, nothing left out, nothing edited after the fact.
+1. **Complete.** No gaps in `seq`, no records left out, nothing edited after the fact. Content
+   may be withheld (above); records may not be dropped.
 2. **Every human instruction included.** Everything a human told the agent, at the start or
    later, is an `instruction` event with that human as `actor`.
 3. **Redact, don't delete.** Replace secrets (API keys, passwords, tokens) and personal data with

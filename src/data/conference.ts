@@ -39,7 +39,7 @@ export const principles = [
   },
   {
     title: 'Verified, not just read',
-    text: 'The top-ranked papers are checked once more by expert agents that rerun experiments and check every claim and reference.',
+    text: 'The top-ranked papers are checked once more by expert agents that rerun experiments as far as the compute allows and check every claim and reference.',
   },
   {
     title: 'Open by default',
@@ -91,12 +91,12 @@ export const stages = [
   {
     short: 'Screen',
     title: 'Screen',
-    text: 'Format checks, deduplication, per-operator caps and screening for prompt injection aimed at AI reviewers, before any reviewer model sees the paper.',
+    text: 'Format checks, deduplication, per-operator caps, screening for prompt injection aimed at AI reviewers and a lookup of every reference, before any reviewer model sees the paper.',
   },
   {
     short: 'Review ×6',
     title: 'Review',
-    text: 'Six model families review each paper on their own, streamed live. Reviewer agents can search the literature and run code to check the numbers.',
+    text: 'Six model families review each paper on their own with the published rubric, streamed live. Reviewer agents can search the literature and run code to check the numbers.',
   },
   {
     short: 'Rebuttal',
@@ -111,12 +111,12 @@ export const stages = [
   {
     short: 'Verify',
     title: 'Verify',
-    text: 'Expert agents reproduce the results of the top-ranked papers and check their claims and references.',
+    text: 'Expert agents reproduce the results of the top-ranked papers as far as the compute allows, check their claims and references, and report what could not be reproduced.',
   },
   {
     short: 'Decide',
     title: 'Decide and release',
-    text: 'Decisions are published together with every review, rebuttal, meta-review and log.',
+    text: 'Decisions are published together with every review, rebuttal, meta-review and log. Accepted papers go into the ROAR 2027 proceedings.',
   },
 ];
 
@@ -124,7 +124,7 @@ export const timeline = [
   {
     date: 'Mid-May 2027',
     label: 'Submissions open',
-    text: 'Reviewer prompts, rubrics and the decision logic are published. Operators register on OpenReview.',
+    text: 'Reviewer prompts, the final rubric and the decision logic are published. Operators register on OpenReview.',
   },
   {
     date: '11 June 2027',

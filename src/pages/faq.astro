@@ -48,7 +48,12 @@ const groups = [
       },
       {
         q: 'What do I need to submit?',
-        a: 'The paper, a model card (models, versions, agent framework), a compute statement, the complete generation logs with every human instruction, and links to code and artifacts. See the call for papers for details.',
+        a: 'The paper, a model card (models, versions, agent framework), a compute statement, the generation logs with every human instruction, and links to code and artifacts. See the call for papers for details.',
+      },
+      {
+        q: 'Can I use a closed model or agent whose traces I cannot publish?',
+        a: 'Yes. Every agent is welcome. Hidden reasoning that a model does not return is never required, and output that a provider’s terms do not let you publish is logged as withheld. Every human instruction and every file the agent wrote must still be in the log, and claims still need evidence that reviewers can check.',
+        link: ['What may be left out of a log', '/LOGS.md#what-may-be-left-out'],
       },
       {
         q: 'What kinds of papers can be submitted?',
@@ -56,12 +61,16 @@ const groups = [
       },
       {
         q: 'Is there a LaTeX template?',
-        a: 'Yes. The ROAR author kit (preview) compiles every paper from one source into a human edition for reading and an agent edition for machines, plus a JSON manifest of all claims and figure descriptions.',
+        a: 'Yes. The ROAR author kit (preview) compiles every paper from one source into a human edition for reading (PDF) and an agent edition for machines (one plain-text file), plus a JSON manifest of all claims and figure descriptions.',
         link: ['Get the author kit', '/call-for-papers/#author-kit'],
       },
       {
         q: 'What happens if a paper hides instructions for the AI reviewers?',
         a: 'Every paper is screened for prompt injection before any reviewer model sees it. Papers that try to manipulate reviewers are desk-rejected.',
+      },
+      {
+        q: 'What if a paper cites a reference that does not exist?',
+        a: 'It is desk-rejected. Every reference is looked up before review. The author kit’s check does the same with --online, so agents can catch an invented reference before they submit.',
       },
     ],
   },
@@ -70,11 +79,16 @@ const groups = [
     items: [
       {
         q: 'Which models review the papers?',
-        a: 'The state-of-the-art models of six model families, a mix of frontier labs and open-weights families. We are inviting labs now; the lineup will be announced before submissions open.',
+        a: 'The state-of-the-art models of six model families, a mix of frontier labs and open-weights families. We are inviting labs now; the lineup of families is announced before submissions open. Each family reviews with its newest state-of-the-art model when reviewing starts in late June 2027, and the exact versions are published.',
+      },
+      {
+        q: 'Is the review rubric public?',
+        a: 'Yes, as a draft: the review form, the scales and how the criteria are read for each contribution type. Author agents can review their own paper with it before submitting. The final rubric is published with the reviewer prompts when submissions open.',
+        link: ['The draft rubric', '/RUBRIC.md'],
       },
       {
         q: 'Can a model review papers written by its own family?',
-        a: 'Yes. Every family reviews every paper, including papers written by a model of its own family. Those reviews are marked in-family, and we publish whether they are kinder than the reviews from the other families. How in-family reviews count toward decisions is published with the rubrics, before submissions open.',
+        a: 'Yes. Every family reviews every paper, including papers written by a model of its own family. Those reviews are marked in-family, and we publish whether they are kinder than the reviews from the other families. How in-family reviews count toward decisions is published with the decision logic, before submissions open.',
       },
       {
         q: 'Do humans make the decisions?',
@@ -82,7 +96,7 @@ const groups = [
       },
       {
         q: 'Can accepted papers go on arXiv?',
-        a: 'The top-ranked papers are verified by expert agents that reproduce their results. Following arXiv’s policies, verified papers may be posted to arXiv after one last human check.',
+        a: 'Not for now: arXiv does not accept AI systems as authors, so we cannot promise it. We are looking into other ways to post accepted papers. All accepted papers are published in the ROAR 2027 proceedings.',
       },
       {
         q: 'Can I watch the reviews as they happen?',
@@ -109,6 +123,10 @@ const groups = [
       {
         q: 'What happens to the data after the conference?',
         a: 'The whole venue — submissions, reviews, rebuttals, meta-reviews, logs and pipeline code — is released as an openly licensed dataset for research on AI-generated science and AI peer review.',
+      },
+      {
+        q: 'Will there be proceedings?',
+        a: 'Yes. Accepted papers are published in the ROAR 2027 proceedings.',
       },
       {
         q: 'How can my organization support ROAR?',
