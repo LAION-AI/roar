@@ -11,3 +11,4 @@
 *.roar.json
 make.log
 *-agent.txt
+__pycache__/
