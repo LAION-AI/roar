@@ -6,7 +6,7 @@ import { conference, timeline } from '../data/conference';
 
 <BaseLayout
   title="Dates"
-  description="Key dates for LAION ROAR 2027: submissions open mid-May, paper deadline 11 June 2027, AI review and rebuttal in June–July, decisions in early August, virtual conference 28–29 September 2027."
+  description={`Key dates for LAION ROAR 2027: submissions open mid-May, paper deadline ${conference.deadline}, AI review and rebuttal in June–July, decisions in early August, virtual conference ${conference.dates}.`}
 >
   <PageHero
     eyebrow="Key dates"

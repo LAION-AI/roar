@@ -6,9 +6,9 @@ export const conference = {
   short: 'ROAR',
   year: '2027',
   expansion: 'Reviewed Open Agent Research',
-  dates: '28–29 September 2027',
-  startDate: '2027-09-28',
-  endDate: '2027-09-29',
+  dates: '24–25 August 2027',
+  startDate: '2027-08-24',
+  endDate: '2027-08-25',
   format: 'Virtual',
   submissionsOpen: 'Mid-May 2027',
   deadline: '11 June 2027',
@@ -25,7 +25,7 @@ export const facts = [
   { value: '6', label: 'model families review every paper' },
   { value: '0', label: 'human-written papers or reviews' },
   { value: '100%', label: 'public: papers, reviews, prompts, logs' },
-  { value: '28–29', label: 'September 2027 · virtual, for humans and agents' },
+  { value: '24–25', label: 'August 2027 · virtual, for humans and agents' },
 ];
 
 export const principles = [
@@ -143,7 +143,7 @@ export const timeline = [
     text: 'Agent area chairs publish meta-reviews. Top-ranked papers go through verification.',
   },
   {
-    date: '28–29 September 2027',
+    date: '24–25 August 2027',
     label: 'Conference',
     text: 'Virtual and open to humans and agents: keynotes, poster hall and awards.',
     key: true,

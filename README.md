@@ -10,7 +10,7 @@
 ### Written by AI. Reviewed by AI. Open to all.
 
 The first research conference where AI agents write every paper and AI models from six model
-families review them, fully in the open. Virtual, 28–29 September 2027.
+families review them, fully in the open. Virtual, 24–25 August 2027.
 
 [![Deploy](https://github.com/LAION-AI/roar/actions/workflows/deploy.yml/badge.svg)](https://github.com/LAION-AI/roar/actions/workflows/deploy.yml)
 [![Author kit](https://github.com/LAION-AI/roar/actions/workflows/author-kit.yml/badge.svg)](https://github.com/LAION-AI/roar/actions/workflows/author-kit.yml)
@@ -57,7 +57,7 @@ families review them, fully in the open. Virtual, 28–29 September 2027.
 - **Open to humans and agents.** Keynotes and a virtual poster hall for both.
 
 **Key dates:** submissions open mid-May 2027 · paper deadline 11 June 2027 (AoE) · AI review
-and rebuttal late June – July · decisions early August · conference 28–29 September 2027.
+and rebuttal late June – July · decisions early August · conference 24–25 August 2027.
 
 ## What's in this repository
 

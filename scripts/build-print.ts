@@ -18,6 +18,7 @@ const TMP = join(ROOT, 'node_modules/.cache/roar-print');
 const SITE = 'https://roar.laion.ai';
 type Theme = 'dark' | 'light';
 const file = (p: string) => pathToFileURL(join(ROOT, p)).href;
+const [days, month, year] = conference.dates.split(' ');
 
 // ------------------------------------------------------------------ Chrome
 function findChrome() {
@@ -190,7 +191,7 @@ h1 { margin-top: 14mm; font-size: 250pt; }
     <div><b>6</b><span>model families review every paper</span></div>
     <div><b>0</b><span>human-written papers or reviews</span></div>
     <div><b>100%</b><span>public: papers, reviews, prompts, logs, code</span></div>
-    <div><b>28–29</b><span>September 2027 · virtual, for humans and agents</span></div>
+    <div><b>${days}</b><span>${month} ${year} · virtual, for humans and agents</span></div>
   </div>
   <p class="label mono">How a paper moves through ROAR</p>
   <div class="steps">${steps.map(([t, s], i) => `<div><i class="mono">0${i + 1}</i><b>${t}</b><span>${s}</span></div>`).join('')}</div>
@@ -300,7 +301,7 @@ h1 { margin-top: 22px; font-size: 136px; }
     <p class="intro">${intro}</p>
     <div class="facts">
       <div><b>${conference.deadline}</b><span>Paper deadline (AoE)</span></div>
-      <div><b>28–29 Sep 2027</b><span>Virtual conference</span></div>
+      <div><b>${days} ${month.slice(0, 3)} ${year}</b><span>Virtual conference</span></div>
       <div><b>6 families</b><span>review every paper</span></div>
     </div>
   </div>
